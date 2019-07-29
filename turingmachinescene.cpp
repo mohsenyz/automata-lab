@@ -31,21 +31,55 @@ void TuringMachineScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     }
     update(sceneRect());
   }
-  QGraphicsScene::mouseMoveEvent(mouseEvent);
+
+  if (currentMode() == Mode::InsertTransition && tempLine != nullptr) {
+    tempLine->setLine(QLineF(tempLine->line().p1(), mouseEvent->scenePos()));
+  }
+
+  AutomataScene::mouseMoveEvent(mouseEvent);
 }
 
 int stateIndex = 0;
 
 void TuringMachineScene::mouseReleaseEvent(
     QGraphicsSceneMouseEvent *mouseEvent) {
-  if (currentMode() == Mode::InsertState) {
-    setCurrentMode(Mode::Select);
-    addState(new StateDrawable(tr("P") + QString::number(stateIndex)),
-             mouseEvent->scenePos());
-    stateIndex++;
+  QGraphicsScene::mouseReleaseEvent(mouseEvent);
+  if (currentMode() == Mode::InsertTransition && tempLine != nullptr) {
+    QList<QGraphicsItem *> list = items(mouseEvent->scenePos());
+    if (!list.empty() && list.first()->type() == ItemType::State) {
+      StateDrawable *fromState =
+          dynamic_cast<StateDrawable *>(items(tempLine->line().p1()).first());
+      StateDrawable *toState = dynamic_cast<StateDrawable *>(list.first());
+      addTransition(new TuringTransitionDrawable(fromState, toState, ' ', ' ',
+                                                 TuringTransition::RIGHT));
+      emit requestSelect();
+    }
+    removeItem(tempLine);
+    delete tempLine;
   }
 }
 
 void TuringMachineScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-
+  if (currentMode() == Mode::InsertTransition) {
+    QList<QGraphicsItem *> list = items(mouseEvent->scenePos());
+    if (list.size() > 0) {
+      if (list.first()->type() == ItemType::State) {
+        tempLine = new QGraphicsLineItem(
+            QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
+        tempLine->setPen(QPen(QColor(60, 60, 60), 2));
+        addItem(tempLine);
+      }
+    }
+  } else {
+    AutomataScene::mousePressEvent(mouseEvent);
+  }
+  if (currentMode() == Mode::InsertState && selectedItems().isEmpty()) {
+    StateDrawable *state =
+        new StateDrawable(tr("P") + QString::number(stateIndex));
+    addState(state, mouseEvent->scenePos());
+    stateIndex++;
+  }
+  if (!selectedItems().isEmpty() && currentMode() == Mode::InsertState) {
+    emit requestSelect();
+  }
 }

@@ -2,6 +2,7 @@
 #include "tape_test.h"
 #include "testsuite.h"
 #include <QApplication>
+using namespace AutomataLab;
 int main(int argc, char *argv[]) {
 
   // Running tests before running app

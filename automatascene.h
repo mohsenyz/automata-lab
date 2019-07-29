@@ -1,12 +1,13 @@
 #ifndef AUTOMATASCENE_H
 #define AUTOMATASCENE_H
-#include "turingmachine.h"
+#include "machine.h"
+#include "statedrawable.h"
 #include <QGraphicsScene>
 
 namespace AutomataLab {
 
 class AutomataScene : public QGraphicsScene {
-
+  Q_OBJECT
 public:
   enum ItemType { State, Transition };
   enum Mode { InsertTransition, InsertState, Select };
@@ -15,6 +16,9 @@ public:
   void setMachineType(MachineType);
   Mode currentMode() const;
   void setCurrentMode(Mode);
+
+signals:
+  void requestSelect();
 
 private:
   Mode _currentMode;

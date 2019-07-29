@@ -41,6 +41,8 @@ QRectF TuringTransitionDrawable::boundingRect() const {
 QPainterPath TuringTransitionDrawable::shape() const {
   QPainterPath path = QGraphicsLineItem::shape();
   path.addPolygon(arrowHead);
+  QRectF textRect(QPointF(line().center()) - QPointF(40, 10), QSizeF(80, 20));
+  path.addRect(textRect);
   return path;
 }
 
@@ -56,6 +58,9 @@ void TuringTransitionDrawable::paint(QPainter *painter,
   if (DRAWABLE_STATE(fromState())->collidesWithItem(DRAWABLE_STATE(toState())))
     return;
   QColor color = lineColor();
+  if (option->state & QStyle::State_Selected) {
+    color = QColor(0, 151, 167);
+  }
   QPen myPen = pen();
   myPen.setWidth(2);
   myPen.setColor(color);
@@ -94,6 +99,17 @@ void TuringTransitionDrawable::paint(QPainter *painter,
 
 void TuringTransitionDrawable::setLineColor(QColor lineColor) {
   _lineColor = lineColor;
+}
+
+void TuringTransitionDrawable::mousePressEvent(
+    QGraphicsSceneMouseEvent *event) {
+  update();
+  QGraphicsItem::mousePressEvent(event);
+}
+
+void TuringTransitionDrawable::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+  update();
+  QGraphicsItem::mouseMoveEvent(event);
 }
 
 QColor TuringTransitionDrawable::lineColor() { return _lineColor; }

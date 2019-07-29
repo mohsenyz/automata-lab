@@ -5,6 +5,7 @@ using namespace AutomataLab;
 
 AutomataScene::AutomataScene(QObject *parent, MachineType machineType)
     : QGraphicsScene(parent) {
+  setMachineType(machineType);
   setBackgroundBrush(Qt::white);
 }
 

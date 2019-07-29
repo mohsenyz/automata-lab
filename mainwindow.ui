@@ -27,21 +27,14 @@
     <string notr="true"/>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1" rowspan="5" colspan="5">
-     <widget class="QGraphicsView" name="graphicsView">
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="3">
-     <widget class="QPushButton" name="pushButton_4">
+    <item row="12" column="4">
+     <widget class="QPushButton" name="pushButton">
       <property name="text">
-       <string>هعی</string>
+       <string>PushButton</string>
       </property>
      </widget>
     </item>
-    <item row="5" column="5">
+    <item row="12" column="5">
      <widget class="QPushButton" name="pushButton_2">
       <property name="styleSheet">
        <string notr="true"/>
@@ -51,60 +44,17 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="4">
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>PushButton</string>
+    <item row="0" column="1" rowspan="12" colspan="5">
+     <widget class="QGraphicsView" name="graphicsView">
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QToolButton" name="toolButton_3">
-      <property name="text">
-       <string>New Component</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
+    <item row="12" column="1">
      <widget class="QLineEdit" name="lineEdit"/>
     </item>
-    <item row="0" column="0">
-     <widget class="QToolButton" name="newStateBtn">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="sizeIncrement">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>New State</string>
-      </property>
-      <property name="arrowType">
-       <enum>Qt::NoArrow</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="2">
-     <widget class="QPushButton" name="pushButton_3">
-      <property name="text">
-       <string>سلام</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QToolButton" name="newTransitionBtn">
-      <property name="text">
-       <string>New Transition</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="6" rowspan="6">
+    <item row="0" column="6" rowspan="13">
      <widget class="QToolBox" name="toolBox">
       <property name="minimumSize">
        <size>
@@ -150,6 +100,81 @@
         <string>Page 2</string>
        </attribute>
       </widget>
+     </widget>
+    </item>
+    <item row="12" column="2">
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="text">
+       <string>سلام</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="moveBtn">
+      <property name="text">
+       <string>Move</string>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="3">
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="text">
+       <string>هعی</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QToolButton" name="newStateBtn">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="sizeIncrement">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>New State</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="arrowType">
+       <enum>Qt::NoArrow</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QToolButton" name="newTransitionBtn">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>New Transition</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QToolButton" name="toolButton_3">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>New Component</string>
+      </property>
      </widget>
     </item>
    </layout>
