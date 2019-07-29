@@ -20,4 +20,4 @@ QChar TuringTransition::write() { return _write; }
 
 TuringTransition::Direction TuringTransition::direction() { return _direction; }
 
-TuringTransition::~TuringTransition() { delete _toState; }
+TuringTransition::~TuringTransition() {}

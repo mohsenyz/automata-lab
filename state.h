@@ -4,27 +4,27 @@
 #include <QString>
 #include <vector>
 
-namespace AutomataLab{
+namespace AutomataLab {
 
-class State
-{
+class State {
 public:
-    State();
-    explicit State(QString label);
+  State();
+  virtual ~State();
+  explicit State(QString label);
 
-    void setInitial(bool);
-    void setFinal(bool);
-    QString label();
-    void setLabel(QString label);
-    bool isInitial();
-    bool isFinal();
-    bool operator== (State&);
+  void setInitial(bool);
+  void setFinal(bool);
+  QString label();
+  void setLabel(QString label);
+  bool isInitial();
+  bool isFinal();
+  virtual bool operator==(State &);
+
 private:
-    bool initial;
-    bool final;
-    QString _label;
+  bool initial;
+  bool final;
+  QString _label;
 };
 
-
-}
+} // namespace AutomataLab
 #endif // STATE_H

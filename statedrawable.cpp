@@ -13,6 +13,7 @@ StateDrawable::StateDrawable(QString label) : State(label) {
   setBackgroundColor(QColor(0, 188, 212));
   shadowEffect = state_default_shadow_effect();
   setGraphicsEffect(shadowEffect);
+  setZValue(10);
 }
 
 StateDrawable::~StateDrawable() {}
@@ -55,7 +56,7 @@ void StateDrawable::setBackgroundColor(QColor backgroundColor) {
   update();
 }
 
-int StateDrawable::type() const { return AutomataScene::ItemTypes::State; }
+int StateDrawable::type() const { return AutomataScene::ItemType::State; }
 
 void StateDrawable::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   update();

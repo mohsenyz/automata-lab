@@ -1,14 +1,15 @@
 #ifndef UI_UTILS_H
 #define UI_UTILS_H
 
+#include "statedrawable.h"
+#include "turingtransitiondrawable.h"
 #include <QGraphicsDropShadowEffect>
 
-QGraphicsDropShadowEffect *state_default_shadow_effect() {
-  QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect();
-  effect->setColor(QColor(30, 30, 30));
-  effect->setBlurRadius(15);
-  effect->setOffset(0, 0);
-  return effect;
-}
+QGraphicsDropShadowEffect *state_default_shadow_effect();
+
+#define DRAWABLE_STATE(state) (dynamic_cast<StateDrawable *>(state))
+
+#define DRAWABLE_TURING_TRANSITION(state)                                      \
+  (dynamic_cast<TuringTransitionDrawable *>(state))
 
 #endif // UI_UTILS_H

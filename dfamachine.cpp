@@ -15,6 +15,17 @@ void DFAMachine::nextStep() {
   tape()->moveRight();
 }
 
+std::vector<Transition *> DFAMachine::findAllTransitions(State *state) {
+  std::vector<Transition *> result;
+  for (auto transition : transitions) {
+    DFATransition *dfaTransition = dynamic_cast<DFATransition *>(transition);
+    if (*(dfaTransition->fromState()) == *state ||
+        *(dfaTransition->toState()) == *state)
+      result.push_back(transition);
+  }
+  return result;
+}
+
 bool DFAMachine::isHalted() {
   return (tape()->read() == BLANK_CHARACTER || halted ||
           currentState() == nullptr);

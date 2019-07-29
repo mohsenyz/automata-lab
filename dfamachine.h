@@ -10,6 +10,7 @@ public:
   using Machine::Machine;
   ~DFAMachine();
   int type();
+  std::vector<Transition *> findAllTransitions(State *);
   void nextStep();
   bool isHalted();
   bool isAccepted();

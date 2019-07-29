@@ -10,6 +10,7 @@ public:
   using Machine::Machine;
   ~TuringMachine();
   int type();
+  std::vector<Transition *> findAllTransitions(State *);
   void nextStep();
   bool isHalted();
   bool isAccepted();

@@ -40,7 +40,10 @@ SOURCES += \
         transition.cpp \
         turingmachine.cpp \
         turingmachine_test.cpp \
-        turingtransition.cpp
+        turingmachinescene.cpp \
+        turingtransition.cpp \
+        turingtransitiondrawable.cpp \
+        ui_utils.cpp
 
 HEADERS += \
         automatascene.h \
@@ -57,7 +60,9 @@ HEADERS += \
         transition.h \
         turingmachine.h \
         turingmachine_test.h \
+        turingmachinescene.h \
         turingtransition.h \
+        turingtransitiondrawable.h \
         ui_utils.h
 
 FORMS += \

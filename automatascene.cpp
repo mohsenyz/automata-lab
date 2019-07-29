@@ -1,14 +1,17 @@
 #include "automatascene.h"
-#include "statedrawable.h"
+#include "ui_utils.h"
 
 using namespace AutomataLab;
 
-AutomataScene::AutomataScene(QObject *parent) : QGraphicsScene(parent) {
+AutomataScene::AutomataScene(QObject *parent, MachineType machineType)
+    : QGraphicsScene(parent) {
   setBackgroundBrush(Qt::white);
-
-  StateDrawable *fPoint = new StateDrawable(tr("P1"));
-  addItem(fPoint);
-
-  StateDrawable *sPoint = new StateDrawable(tr("P2"));
-  addItem(sPoint);
 }
+
+MachineType AutomataScene::machineType() const { return _machineType; }
+
+void AutomataScene::setMachineType(MachineType type) { _machineType = type; }
+
+AutomataScene::Mode AutomataScene::currentMode() const { return _currentMode; }
+
+void AutomataScene::setCurrentMode(Mode mode) { _currentMode = mode; }

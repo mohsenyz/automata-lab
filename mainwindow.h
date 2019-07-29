@@ -15,6 +15,7 @@ public:
   ~MainWindow();
 
 private slots:
+  void on_newStateBtn_clicked();
 
 private:
   Ui::MainWindow *ui;

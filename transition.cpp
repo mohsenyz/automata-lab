@@ -18,7 +18,7 @@ bool Transition::accepts(QChar input) {
   return false;
 }
 
-Transition::~Transition() { delete _fromState; }
+Transition::~Transition() {}
 
 State *Transition::fromState() { return _fromState; }
 

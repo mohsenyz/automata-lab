@@ -21,6 +21,7 @@ public:
   void addTransition(Transition *);
   bool transitionExists(Transition *);
   Transition *findTransition(State *, QChar);
+  virtual std::vector<Transition *> findAllTransitions(State *);
   State *stateByLabel(QString);
   void clearStates();
   void clearTransitions();
@@ -37,13 +38,13 @@ public:
   virtual bool run() = 0;
 
 private:
-  std::vector<State *> states;
-  std::vector<Transition *> transitions;
   Tape *_tape;
   State *_currentState;
 
 protected:
   void setCurrentState(State *);
+  std::vector<State *> states;
+  std::vector<Transition *> transitions;
 };
 
 } // namespace AutomataLab

@@ -17,4 +17,4 @@ bool DFATransition::operator==(DFATransition &transition) {
          *(transition.toState()) == *(this->toState());
 }
 
-DFATransition::~DFATransition() { delete _toState; }
+DFATransition::~DFATransition() {}

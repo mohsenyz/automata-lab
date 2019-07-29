@@ -52,6 +52,15 @@ Transition *Machine::findTransition(State *fromState, QChar input) {
   return nullptr;
 }
 
+std::vector<Transition *> Machine::findAllTransitions(State *state) {
+  std::vector<Transition *> result;
+  for (auto transition : transitions) {
+    if (*(transition->fromState()) == *state)
+      result.push_back(transition);
+  }
+  return result;
+}
+
 State *Machine::stateByLabel(QString label) {
   for (auto state : states) {
     if (state->label() == label)
