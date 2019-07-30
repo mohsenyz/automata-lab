@@ -32,9 +32,16 @@ void TuringMachineScene::addTransition(TuringTransitionDrawable *transition) {
     qDebug(std::to_string(size).c_str());
     transition->setCurve(size - 1);
   } else {
+    if (size > 1) {
+      TuringTransition *tt = transitions.at(transitions.size() - 2);
+      if (tt->toState() == transition->fromState()) {
+        curve = curve * -1;
+      }
+    }
     transition->setCurve(curve);
   }
   addItem(transition);
+  update();
 }
 
 void TuringMachineScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {

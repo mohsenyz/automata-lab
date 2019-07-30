@@ -35,6 +35,7 @@ SOURCES += \
         state.cpp \
         statedrawable.cpp \
         tape.cpp \
+        tapedrawable.cpp \
         testsuite.cpp \
         tape_test.cpp \
         transition.cpp \
@@ -55,6 +56,7 @@ HEADERS += \
         state.h \
         statedrawable.h \
         tape.h \
+        tapedrawable.h \
         testsuite.h \
         tape_test.h \
         transition.h \

@@ -18,7 +18,7 @@ public:
   void write(QChar);
   QString toString();
 
-private:
+protected:
   std::deque<QChar> tape;
   unsigned int currentIndex;
 };
