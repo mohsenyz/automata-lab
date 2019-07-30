@@ -1,4 +1,4 @@
-#include "turingtransitiondrawable.h"
+﻿#include "turingtransitiondrawable.h"
 #include "ui_utils.h"
 using namespace AutomataLab;
 
@@ -7,44 +7,37 @@ using namespace AutomataLab;
 
 TuringTransitionDrawable::TuringTransitionDrawable(
     StateDrawable *startState, StateDrawable *endState,
-    std::vector<QChar> acceptedInputs, QChar write, Direction direction,
-    QGraphicsItem *parent)
+    std::vector<QChar> acceptedInputs, QChar write, Direction direction)
     : TuringTransition(startState, endState, acceptedInputs, write, direction),
-      QGraphicsLineItem(parent) {
+      QGraphicsItem() {
   setZValue(5);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setLineColor(Qt::black);
 }
 
-TuringTransitionDrawable::TuringTransitionDrawable(
-    StateDrawable *startState, StateDrawable *endState, QChar acceptedInput,
-    QChar write, Direction direction, QGraphicsItem *parent)
+TuringTransitionDrawable::TuringTransitionDrawable(StateDrawable *startState,
+                                                   StateDrawable *endState,
+                                                   QChar acceptedInput,
+                                                   QChar write,
+                                                   Direction direction)
     : TuringTransition(startState, endState, acceptedInput, write, direction),
-      QGraphicsLineItem(parent) {
+      QGraphicsItem() {
   setZValue(5);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setLineColor(Qt::black);
 }
 
 int TuringTransitionDrawable::type() const {
-  return AutomataScene::ItemType::Transition;
+  return AutomataScene::ItemType::TransitionItem;
 }
 
 QRectF TuringTransitionDrawable::boundingRect() const {
-  qreal extra = (pen().width() + 20) / 2.0;
-  return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(),
-                                    line().p2().y() - line().p1().y()))
-      .normalized()
-      .adjusted(-extra, -extra, extra, extra);
+  qreal extra = 4;
+  return _linePath.boundingRect().normalized().adjusted(-extra, -extra, extra,
+                                                        extra);
 }
 
-QPainterPath TuringTransitionDrawable::shape() const {
-  QPainterPath path = QGraphicsLineItem::shape();
-  path.addPolygon(arrowHead);
-  QRectF textRect(QPointF(line().center()) - QPointF(40, 10), QSizeF(80, 20));
-  path.addRect(textRect);
-  return path;
-}
+QPainterPath TuringTransitionDrawable::shape() const { return _linePath; }
 
 void TuringTransitionDrawable::updatePosition() {
   QLineF line(mapFromItem(DRAWABLE_STATE(fromState()), 0, 0),
@@ -55,14 +48,22 @@ void TuringTransitionDrawable::updatePosition() {
 void TuringTransitionDrawable::paint(QPainter *painter,
                                      const QStyleOptionGraphicsItem *option,
                                      QWidget *) {
-  if (DRAWABLE_STATE(fromState())->collidesWithItem(DRAWABLE_STATE(toState())))
+  if (DRAWABLE_STATE(fromState())
+          ->collidesWithItem(DRAWABLE_STATE(toState())) &&
+      !(*fromState() == *toState()))
     return;
+  QString direction = "L";
+  if (TuringTransition::direction() == Direction::RIGHT) {
+    direction = "R";
+  }
+  QString labelText =
+      QString(acceptInputs()[0]) + "," + QString(write()) + "," + direction;
   QColor color = lineColor();
   if (option->state & QStyle::State_Selected) {
     color = QColor(0, 151, 167);
   }
-  QPen myPen = pen();
-  myPen.setWidth(2);
+  QPen myPen;
+  myPen.setWidth(4);
   myPen.setColor(color);
   qreal arrowSize = 15;
   painter->setPen(myPen);
@@ -73,33 +74,80 @@ void TuringTransitionDrawable::paint(QPainter *painter,
   auto toPoint = DRAWABLE_STATE(toState())->pos() +
                  DRAWABLE_STATE(toState())->boundingRect().center();
 
+  if (*fromState() == *toState()) {
+    int width = 130 + curve() * 30;
+    _linePath = QPainterPath();
+    QRectF rect = QRectF(fromPoint - QPointF(width / 2, width - 20),
+                         QSizeF(width, width));
+    QPainterPathStroker stroker;
+    stroker.setWidth(3);
+    _linePath.arcTo(rect, 0, 360 * 16);
+    _linePath = stroker.createStroke(_linePath);
+    painter->drawArc(rect, 0, 360 * 16);
+    QRectF textRect(rect.center() - QPointF(40, rect.height() / 2),
+                    QSizeF(80, 20));
+    painter->drawRect(textRect);
+    painter->setPen(Qt::white);
+    painter->drawText(textRect, labelText,
+                      QTextOption(Qt::AlignmentFlag::AlignCenter));
+    return;
+  }
+
   QLineF centerLine(fromPoint, toPoint);
   centerLine.setLength(centerLine.length() - 55);
 
   setLine(centerLine);
 
-  double angle = std::atan2(line().dy(), -line().dx());
+  QLineF smallLine = line();
+  smallLine.setLength(smallLine.length() + 55);
+  _linePath = QPainterPath();
+  _linePath.moveTo(smallLine.p1());
+  QLineF normalLine;
+  normalLine.setP1(smallLine.center());
+  normalLine.setAngle(smallLine.normalVector().angle());
+  normalLine.setLength(60 * curve());
+  _linePath.quadTo(normalLine.p2(), smallLine.p2());
+  QPainterPathStroker stroker;
+  stroker.setWidth(0);
+  QPainterPath backup = _linePath;
+  _linePath = stroker.createStroke(_linePath);
+  painter->drawPath(_linePath);
 
-  QPointF arrowP1 = line().p2() + QPointF(sin(angle + M_PI / 3) * arrowSize,
-                                          cos(angle + M_PI / 3) * arrowSize);
-  QPointF arrowP2 =
-      line().p2() + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
-                            cos(angle + M_PI - M_PI / 3) * arrowSize);
+  QLineF arrowLine(backup.pointAtPercent(0.95), smallLine.p2());
+  double angle = std::atan2(arrowLine.dy(), -arrowLine.dx());
+  QPointF p2 =
+      backup.pointAtPercent(1 - backup.toReversed().percentAtLength(50));
+
+  QPointF arrowP1 = p2 + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                 cos(angle + M_PI / 3) * arrowSize);
+  QPointF arrowP2 = p2 + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                 cos(angle + M_PI - M_PI / 3) * arrowSize);
 
   arrowHead.clear();
-  arrowHead << line().p2() << arrowP1 << arrowP2;
-  painter->drawLine(line());
+  arrowHead << p2 << arrowP1 << arrowP2;
+
   painter->drawPolygon(arrowHead);
-  QRectF textRect(QPointF(line().center()) - QPointF(40, 10), QSizeF(80, 20));
+  normalLine.setLength(30 * abs(curve()));
+  QRectF textRect(normalLine.p2() - QPointF(40, 10), QSizeF(80, 20));
+  _linePath.addRect(textRect);
+  _linePath.addPolygon(arrowHead);
   painter->drawRect(textRect);
   painter->setPen(Qt::white);
-  painter->drawText(textRect, "Test",
+  painter->drawText(textRect, labelText,
                     QTextOption(Qt::AlignmentFlag::AlignCenter));
 }
+
+void TuringTransitionDrawable::setLine(QLineF line) { _line = line; }
+
+QLineF TuringTransitionDrawable::line() const { return _line; }
 
 void TuringTransitionDrawable::setLineColor(QColor lineColor) {
   _lineColor = lineColor;
 }
+
+void TuringTransitionDrawable::setCurve(short curve) { _curve = curve; }
+
+short TuringTransitionDrawable::curve() { return _curve; }
 
 void TuringTransitionDrawable::mousePressEvent(
     QGraphicsSceneMouseEvent *event) {

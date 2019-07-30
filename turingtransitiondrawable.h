@@ -13,23 +13,24 @@ namespace AutomataLab {
 
 class TuringTransitionDrawable : public QObject,
                                  public TuringTransition,
-                                 public QGraphicsLineItem {
+                                 public QGraphicsItem {
   Q_OBJECT
   Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
 public:
   TuringTransitionDrawable(StateDrawable *, StateDrawable *, std::vector<QChar>,
-                           QChar, Direction, QGraphicsItem * = 0);
+                           QChar, Direction);
 
   TuringTransitionDrawable(StateDrawable *, StateDrawable *, QChar, QChar,
-                           Direction, QGraphicsItem * = 0);
+                           Direction);
 
   int type() const override;
   QRectF boundingRect() const override;
   QPainterPath shape() const override;
   void updatePosition();
-
   QColor lineColor();
   void setLineColor(QColor);
+  short curve();
+  void setCurve(short);
 
 protected:
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -38,8 +39,13 @@ protected:
              QWidget *widget = 0) override;
 
 private:
+  void setLine(QLineF);
+  QLineF line() const;
+  short _curve = 0;
+  QLineF _line;
   QColor _lineColor;
   QPolygonF arrowHead;
+  QPainterPath _linePath;
 };
 
 } // namespace AutomataLab

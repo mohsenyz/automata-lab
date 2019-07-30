@@ -56,7 +56,7 @@ void StateDrawable::setBackgroundColor(QColor backgroundColor) {
   update();
 }
 
-int StateDrawable::type() const { return AutomataScene::ItemType::State; }
+int StateDrawable::type() const { return AutomataScene::ItemType::StateItem; }
 
 void StateDrawable::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   update();

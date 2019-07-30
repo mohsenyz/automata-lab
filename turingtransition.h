@@ -14,10 +14,12 @@ public:
   State *toState();
   QChar write();
   Direction direction();
+  void setWrite(QChar);
+  void setDirection(Direction);
 
 private:
   State *_toState;
-  QChar _write;
+  QChar _write = ' ';
   Direction _direction;
 };
 

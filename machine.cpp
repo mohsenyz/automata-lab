@@ -1,4 +1,5 @@
 #include "machine.h"
+#include <algorithm>
 
 using namespace AutomataLab;
 
@@ -19,9 +20,19 @@ void Machine::addTransition(Transition *transition) {
     transitions.push_back(transition);
 }
 
+void Machine::removeTransition(Transition *transition) {
+  transitions.erase(
+      std::remove(transitions.begin(), transitions.end(), transition),
+      transitions.end());
+}
+
+void Machine::removeState(State *state) {
+  states.erase(std::remove(states.begin(), states.end(), state), states.end());
+}
+
 bool Machine::transitionExists(Transition *transition) {
   for (auto _transition : transitions) {
-    if (*_transition == *transition)
+    if (*_transition == *transition && _transition != transition)
       return true;
   }
   return false;
@@ -29,7 +40,7 @@ bool Machine::transitionExists(Transition *transition) {
 
 bool Machine::stateExists(State *state) {
   for (auto _state : states) {
-    if (*_state == *state)
+    if (*_state == *state && _state != state)
       return true;
   }
   return false;
@@ -50,15 +61,6 @@ Transition *Machine::findTransition(State *fromState, QChar input) {
       return transition;
   }
   return nullptr;
-}
-
-std::vector<Transition *> Machine::findAllTransitions(State *state) {
-  std::vector<Transition *> result;
-  for (auto transition : transitions) {
-    if (*(transition->fromState()) == *state)
-      result.push_back(transition);
-  }
-  return result;
 }
 
 State *Machine::stateByLabel(QString label) {

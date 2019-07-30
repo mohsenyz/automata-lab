@@ -13,6 +13,9 @@ public:
   Transition(State *, QChar);
   virtual ~Transition();
   bool accepts(QChar);
+  std::vector<QChar> acceptInputs();
+  void setAcceptInputs(std::vector<QChar>);
+  void setAcceptInput(QChar);
   State *fromState();
   virtual bool operator==(Transition &);
 

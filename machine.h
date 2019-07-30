@@ -21,11 +21,12 @@ public:
   void addTransition(Transition *);
   bool transitionExists(Transition *);
   Transition *findTransition(State *, QChar);
-  virtual std::vector<Transition *> findAllTransitions(State *);
   State *stateByLabel(QString);
   void clearStates();
   void clearTransitions();
   void clearTape();
+  void removeTransition(Transition *);
+  void removeState(State *);
   virtual void prepareRun();
   void setTape(Tape *);
   Tape *tape();
