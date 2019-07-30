@@ -44,6 +44,33 @@ void TuringMachineScene::addTransition(TuringTransitionDrawable *transition) {
   update();
 }
 
+void TuringMachineScene::recurveTransitions(State *fromState, State *toState) {
+  std::vector<TuringTransition *> transitions =
+      TuringMachine::findAllTransitionsBetween(fromState, toState);
+  int curve = 0;
+  int index = 0;
+  for (auto tr : transitions) {
+    TuringTransitionDrawable *transition =
+        dynamic_cast<TuringTransitionDrawable *>(tr);
+    if (transition->fromState() != fromState) {
+      curve = curve * -1;
+    }
+    transition->setCurve(curve);
+    if (curve == 0) {
+      curve++;
+    } else {
+      if (curve > 0) {
+        curve = curve * -1;
+      } else {
+        curve = abs(curve) + 1;
+      }
+    }
+  }
+  if (transitions.size() > 0) {
+    update();
+  }
+}
+
 void TuringMachineScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if (!selectedItems().isEmpty()) {
     QGraphicsItem *item = selectedItems()[0];
@@ -77,7 +104,8 @@ void TuringMachineScene::mouseReleaseEvent(
       StateDrawable *fromState =
           dynamic_cast<StateDrawable *>(items(tempLine->line().p1()).first());
       StateDrawable *toState = dynamic_cast<StateDrawable *>(list.first());
-      ttd = new TuringTransitionDrawable(fromState, toState, ' ', ' ',
+      ttd = new TuringTransitionDrawable(fromState, toState, BLANK_CHARACTER,
+                                         BLANK_CHARACTER,
                                          TuringTransition::RIGHT);
       addTransition(ttd);
       update();
@@ -109,9 +137,12 @@ void TuringMachineScene::keyPressEvent(QKeyEvent *keyEvent) {
       } else if (selectedItems().first()->type() == ItemType::TransitionItem) {
         TuringTransitionDrawable *sd =
             dynamic_cast<TuringTransitionDrawable *>(selectedItems().first());
+        State *fromState = sd->fromState();
+        State *toState = sd->toState();
         removeItem(sd);
         removeTransition(sd);
         delete sd;
+        recurveTransitions(fromState, toState);
       }
     }
     break;

@@ -23,6 +23,7 @@ protected:
   void keyPressEvent(QKeyEvent *keyEvent) override;
 
 private:
+  void recurveTransitions(State *fromState, State *toState);
   QGraphicsLineItem *tempLine = nullptr;
 };
 
