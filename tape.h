@@ -13,14 +13,14 @@ class Tape {
 public:
   explicit Tape(QString);
   QChar read();
-  void moveRight();
-  void moveLeft();
-  void write(QChar);
+  virtual void moveRight();
+  virtual void moveLeft();
+  virtual void write(QChar);
   QString toString();
 
 protected:
   std::deque<QChar> tape;
-  unsigned int currentIndex;
+  unsigned int currentIndex = 0;
 };
 
 } // namespace AutomataLab

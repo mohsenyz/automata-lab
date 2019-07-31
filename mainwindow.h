@@ -22,6 +22,9 @@ private slots:
   void transitionEditRule(Transition *transition);
   void stateEditLabel(State *state);
   void stateSelected(State *);
+  void stateUnselected();
+  void headMoved(QPointF);
+  void stateSetInitial(StateDrawable *);
 
   void on_newTransitionBtn_clicked();
   void uncheckToolBtns();
@@ -30,6 +33,8 @@ private:
   void createToolboxPanels();
   InspectorLayout *inspectorLayout;
   Ui::MainWindow *ui;
+  AutomataScene *automataScene;
+  QGraphicsScene *tapeScene;
 };
 } // namespace AutomataLab
 

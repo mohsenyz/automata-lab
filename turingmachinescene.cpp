@@ -158,4 +158,9 @@ void TuringMachineScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       emit stateSelected(dynamic_cast<State *>(selectedItems().first()));
     }
   }
+  if (selectedItems().size() == 0 ||
+      (selectedItems().size() > 0 &&
+       selectedItems().first()->type() == ItemType::TransitionItem)) {
+    emit stateUnselected();
+  }
 }

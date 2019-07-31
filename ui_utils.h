@@ -15,4 +15,6 @@ QGraphicsDropShadowEffect *state_default_shadow_effect();
 
 #define SCENE_TURING_MACHINE(scene) (dynamic_cast<TuringMachineScene *>(scene))
 
+#define SCENE_MACHINE(scene) (dynamic_cast<Machine *>(scene))
+
 #endif // UI_UTILS_H

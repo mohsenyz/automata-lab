@@ -9,7 +9,7 @@ namespace AutomataLab {
 class AutomataScene : public QGraphicsScene {
   Q_OBJECT
 public:
-  enum ItemType { StateItem, TransitionItem };
+  enum ItemType { StateItem, TransitionItem, TapeItem };
   enum Mode { InsertTransition, InsertState, Select };
   AutomataScene(QObject *parent, MachineType);
   MachineType machineType() const;
@@ -23,9 +23,10 @@ signals:
   void transitionEditRule(Transition *transition);
   void stateEditLabel(State *state);
   void stateSelected(State *);
+  void stateUnselected();
 
 protected:
-  void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *mouseEvent);
+  void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
 
 private:
   Mode _currentMode;

@@ -66,15 +66,15 @@ void InspectorLayout::invalidate() {
 }
 
 void InspectorLayout::initialCheckboxStateChanged(int currentState) {
-  state()->setInitial(currentState == Qt::Checked);
-  state()->update();
+  if (currentState == Qt::Checked) {
+    emit stateSetInitial(state());
+  } else {
+    state()->setInitial(false);
+  }
 }
 
 void InspectorLayout::finalCheckboxStateChanged(int currentState) {
   state()->setFinal(currentState == Qt::Checked);
-  if (state()->isInitial()) {
-    emit stateSetInitial(state());
-  }
   state()->update();
 }
 

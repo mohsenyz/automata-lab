@@ -32,7 +32,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0,5,1" columnstretch="1,5,1">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,7,2" columnstretch="1,5,1">
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -165,7 +165,7 @@
     <item row="2" column="1">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QGraphicsView" name="graphicsView_2">
+       <widget class="QGraphicsView" name="tapeView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
           <horstretch>0</horstretch>
@@ -180,10 +180,27 @@
          <enum>QLayout::SetMinimumSize</enum>
         </property>
         <item>
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="inputMask">
+           <string/>
+          </property>
+          <property name="placeholderText">
+           <string>Enter the input ex : 1010000010001 then press &quot;Set input&quot;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="text">
+           <string>Set input</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_3">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Fast run</string>
           </property>
@@ -191,8 +208,21 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_4">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Next step</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Stop</string>
           </property>
          </widget>
         </item>

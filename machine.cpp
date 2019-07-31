@@ -12,7 +12,9 @@ Machine::~Machine() {
 
 void Machine::addState(State *state) {
   if (!stateExists(state))
-    states.push_back(state);
+    if (!(state->isInitial() && initialStateExists())) {
+      states.push_back(state);
+    }
 }
 
 void Machine::addTransition(Transition *transition) {

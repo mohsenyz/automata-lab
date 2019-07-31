@@ -39,6 +39,18 @@ void StateDrawable::paint(QPainter *painter,
     painter->drawArc(innerRect, 0, 360 * 16);
   }
 
+  if (isInitial()) {
+    int centerY = rect.center().y();
+    int centerX = rect.center().x();
+    QPainterPath path;
+    path.moveTo(30, centerY);
+    path.arcTo(rect, 150, 60);
+    path.closeSubpath();
+    painter->setBrush(QColor(255, 193, 7));
+    painter->drawPath(path);
+    painter->setBrush(backgroundColor());
+  }
+
   QFont font = painter->font();
   font.setPointSize(font.pointSize() * 1.7);
   painter->setFont(font);

@@ -9,13 +9,19 @@ class TapeDrawable : public QObject, public Tape, public QGraphicsItem {
   Q_OBJECT
 public:
   explicit TapeDrawable(QString);
-  //  int type() const override;
-  //  QRectF boundingRect() const override;
+  int type() const override;
+  QRectF boundingRect() const override;
+  void moveRight() override;
+  void moveLeft() override;
+  void write(QChar) override;
 
-  // protected:
-  //  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-  //             QWidget *widget = 0) override;
-  //  void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+signals:
+  void headMoved(QPointF);
+
+protected:
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+             QWidget *widget = 0) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 } // namespace AutomataLab
