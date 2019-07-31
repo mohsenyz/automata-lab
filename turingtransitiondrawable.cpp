@@ -145,9 +145,9 @@ void TuringTransitionDrawable::setLineColor(QColor lineColor) {
   _lineColor = lineColor;
 }
 
-void TuringTransitionDrawable::setCurve(short curve) { _curve = curve; }
+void TuringTransitionDrawable::setCurve(int curve) { _curve = curve; }
 
-short TuringTransitionDrawable::curve() { return _curve; }
+int TuringTransitionDrawable::curve() { return _curve; }
 
 void TuringTransitionDrawable::mousePressEvent(
     QGraphicsSceneMouseEvent *event) {

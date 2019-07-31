@@ -29,6 +29,7 @@ SOURCES += \
         dfamachine.cpp \
         dfamachine_test.cpp \
         dfatransition.cpp \
+        inspectorlayout.cpp \
         machine.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -51,6 +52,7 @@ HEADERS += \
         dfamachine.h \
         dfamachine_test.h \
         dfatransition.h \
+        inspectorlayout.h \
         machine.h \
         mainwindow.h \
         state.h \

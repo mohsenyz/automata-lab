@@ -28,9 +28,16 @@ void StateDrawable::paint(QPainter *painter,
   }
   QRectF rect = boundingRect();
   QPen pen(borderColor(), 3);
-  painter->setBrush(backgroundColor());
   painter->setPen(pen);
+  painter->setBrush(backgroundColor());
   painter->drawEllipse(rect);
+
+  if (isFinal()) {
+    QRectF innerRect = rect;
+    innerRect.setSize(rect.size() - QSizeF(16, 16));
+    innerRect.translate(8, 8);
+    painter->drawArc(innerRect, 0, 360 * 16);
+  }
 
   QFont font = painter->font();
   font.setPointSize(font.pointSize() * 1.7);

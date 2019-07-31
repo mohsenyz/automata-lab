@@ -17,30 +17,9 @@ void TuringMachineScene::addState(StateDrawable *state, QPointF position) {
 }
 
 void TuringMachineScene::addTransition(TuringTransitionDrawable *transition) {
-  std::vector<TuringTransition *> transitions =
-      TuringMachine::findAllTransitionsBetween(transition->fromState(),
-                                               transition->toState());
   TuringMachine::addTransition(transition);
-  int curve = transitions.size();
-  int size = curve;
-  if (abs(curve) > 0) {
-    curve = ceil(curve / 2.0);
-    if (size % 2 == 0)
-      curve = curve * -1;
-  }
-  if (transition->fromState() == transition->toState()) {
-    qDebug(std::to_string(size).c_str());
-    transition->setCurve(size - 1);
-  } else {
-    if (size > 1) {
-      TuringTransition *tt = transitions.at(transitions.size() - 2);
-      if (tt->toState() == transition->fromState()) {
-        curve = curve * -1;
-      }
-    }
-    transition->setCurve(curve);
-  }
   addItem(transition);
+  recurveTransitions(transition->fromState(), transition->toState());
   update();
 }
 
@@ -48,12 +27,14 @@ void TuringMachineScene::recurveTransitions(State *fromState, State *toState) {
   std::vector<TuringTransition *> transitions =
       TuringMachine::findAllTransitionsBetween(fromState, toState);
   int curve = 0;
-  int index = 0;
   for (auto tr : transitions) {
     TuringTransitionDrawable *transition =
         dynamic_cast<TuringTransitionDrawable *>(tr);
-    if (transition->fromState() != fromState) {
-      curve = curve * -1;
+    if (transitions.size() > 1) {
+      TuringTransition *prevTransition = transitions.at(transitions.size() - 2);
+      if (transition->fromState() != prevTransition->fromState()) {
+        curve *= -1;
+      }
     }
     transition->setCurve(curve);
     if (curve == 0) {
@@ -73,16 +54,7 @@ void TuringMachineScene::recurveTransitions(State *fromState, State *toState) {
 
 void TuringMachineScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if (!selectedItems().isEmpty()) {
-    QGraphicsItem *item = selectedItems()[0];
-    if (item->type() == ItemType::StateItem) {
-      StateDrawable *drawable = DRAWABLE_STATE(item);
-      std::vector<TuringTransition *> transitions =
-          findAllTransitions(drawable);
-      for (auto transition : transitions) {
-        DRAWABLE_TURING_TRANSITION(transition)->updatePosition();
-      }
-    }
-    update(sceneRect());
+    update();
   }
 
   if (currentMode() == Mode::InsertTransition && tempLine != nullptr) {
@@ -102,10 +74,9 @@ void TuringMachineScene::mouseReleaseEvent(
     TuringTransitionDrawable *ttd = nullptr;
     if (!list.empty() && list.first()->type() == ItemType::StateItem) {
       StateDrawable *fromState =
-          dynamic_cast<StateDrawable *>(items(tempLine->line().p1()).first());
-      StateDrawable *toState = dynamic_cast<StateDrawable *>(list.first());
-      ttd = new TuringTransitionDrawable(fromState, toState, BLANK_CHARACTER,
-                                         BLANK_CHARACTER,
+                        DRAWABLE_STATE(items(tempLine->line().p1()).first()),
+                    *toState = DRAWABLE_STATE(list.first());
+      ttd = new TuringTransitionDrawable(fromState, toState, ' ', ' ',
                                          TuringTransition::RIGHT);
       addTransition(ttd);
       update();
@@ -122,31 +93,41 @@ void TuringMachineScene::keyPressEvent(QKeyEvent *keyEvent) {
   switch (keyEvent->key()) {
   case Qt::Key_Delete:
     if (!selectedItems().isEmpty()) {
-      if (selectedItems().first()->type() == ItemType::StateItem) {
-        StateDrawable *sd =
-            dynamic_cast<StateDrawable *>(selectedItems().first());
-        std::vector<TuringTransition *> list = findAllTransitions(sd);
-        for (auto transition : list) {
-          removeItem(dynamic_cast<QGraphicsItem *>(transition));
-          removeTransition(transition);
-          delete transition;
-        }
-        removeItem(sd);
-        removeState(sd);
-        delete sd;
-      } else if (selectedItems().first()->type() == ItemType::TransitionItem) {
-        TuringTransitionDrawable *sd =
-            dynamic_cast<TuringTransitionDrawable *>(selectedItems().first());
-        State *fromState = sd->fromState();
-        State *toState = sd->toState();
-        removeItem(sd);
-        removeTransition(sd);
-        delete sd;
-        recurveTransitions(fromState, toState);
+      QGraphicsItem *selectedItem = selectedItems().first();
+
+      // Delete state
+      if (selectedItem->type() == ItemType::StateItem) {
+        removeState(DRAWABLE_STATE(selectedItems().first()));
+      }
+
+      // Delete transition
+      if (selectedItem->type() == ItemType::TransitionItem) {
+        removeTransition(DRAWABLE_TURING_TRANSITION(selectedItem));
       }
     }
     break;
   }
+}
+
+void TuringMachineScene::removeTransition(
+    TuringTransitionDrawable *transition) {
+  State *fromState = transition->fromState(), *toState = transition->toState();
+  removeItem(transition);
+  TuringMachine::removeTransition(transition);
+  delete transition;
+  recurveTransitions(fromState, toState);
+  update();
+}
+
+void TuringMachineScene::removeState(StateDrawable *state) {
+  std::vector<TuringTransition *> list = findAllTransitions(state);
+  for (auto transition : list) {
+    removeTransition(DRAWABLE_TURING_TRANSITION(transition));
+  }
+  removeItem(state);
+  TuringMachine::removeState(state);
+  delete state;
+  update();
 }
 
 void TuringMachineScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
@@ -171,5 +152,10 @@ void TuringMachineScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   }
   if (!selectedItems().isEmpty() && currentMode() == Mode::InsertState) {
     emit requestSelect();
+  }
+  if (selectedItems().size() > 0) {
+    if (selectedItems().first()->type() == ItemType::StateItem) {
+      emit stateSelected(dynamic_cast<State *>(selectedItems().first()));
+    }
   }
 }

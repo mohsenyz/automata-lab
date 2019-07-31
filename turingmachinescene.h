@@ -14,7 +14,8 @@ public:
   TuringMachineScene(QObject *parent);
   void addState(StateDrawable *, QPointF);
   void addTransition(TuringTransitionDrawable *transition);
-signals:
+  void removeTransition(TuringTransitionDrawable *transition);
+  void removeState(StateDrawable *state);
 
 protected:
   void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;

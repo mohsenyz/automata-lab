@@ -1,5 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include "inspectorlayout.h"
 #include "machine.h"
 #include "turingmachinescene.h"
 #include "ui_mainwindow.h"
@@ -20,11 +21,14 @@ private slots:
   void transitionInserted(Transition *transition);
   void transitionEditRule(Transition *transition);
   void stateEditLabel(State *state);
+  void stateSelected(State *);
 
   void on_newTransitionBtn_clicked();
   void uncheckToolBtns();
 
 private:
+  void createToolboxPanels();
+  InspectorLayout *inspectorLayout;
   Ui::MainWindow *ui;
 };
 } // namespace AutomataLab

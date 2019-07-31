@@ -1,7 +1,12 @@
 ﻿#include "mainwindow.h"
+#include "ui_utils.h"
+#include <QCheckBox>
 #include <QInputDialog>
+#include <QLabel>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QSpacerItem>
+#include <QWidget>
 
 using namespace AutomataLab;
 AutomataScene *scene;
@@ -19,11 +24,22 @@ MainWindow::MainWindow(QWidget *parent)
           SLOT(transitionEditRule(Transition *)));
   connect(scene, SIGNAL(stateEditLabel(State *)), this,
           SLOT(stateEditLabel(State *)));
+  connect(scene, SIGNAL(stateSelected(State *)), this,
+          SLOT(stateSelected(State *)));
   scene->setSceneRect(0, 0, 2000, 2000);
   ui->graphicsView->setScene(scene);
   ui->graphicsView->setRenderHints(QPainter::Antialiasing |
                                    QPainter::SmoothPixmapTransform);
   ui->graphicsView->centerOn(0, 0);
+
+  createToolboxPanels();
+}
+
+void MainWindow::createToolboxPanels() {
+  inspectorLayout = new InspectorLayout(this);
+  ui->toolBox->removeItem(0);
+  inspectorLayout->attach(ui->toolBox);
+  ui->toolBox->insertItem(1, new QWidget(this), "Multiple run");
 }
 
 void MainWindow::uncheckToolBtns() {
@@ -32,6 +48,11 @@ void MainWindow::uncheckToolBtns() {
 }
 
 MainWindow::~MainWindow() { delete ui; }
+
+void MainWindow::stateSelected(State *state) {
+  inspectorLayout->focus();
+  inspectorLayout->setState(DRAWABLE_STATE(state));
+}
 
 void MainWindow::transitionEditRule(Transition *transition) {
   if (scene->machineType() == TURING) {
@@ -50,7 +71,8 @@ void MainWindow::transitionEditRule(Transition *transition) {
                               QLineEdit::Normal, labelText, &ok);
     QStringList list = text.split(",");
     if (list.size() == 3 && text.size() == 5 &&
-        (list.last() == "R" || list.last() == "L") && ok) {
+        (list.last() == "R" || list.last() == "L") && list[0][0] != ' ' &&
+        list[1][0] != ' ' && ok) {
       tt->setAcceptInput(list[0][0]);
       tt->setWrite(list[1][0]);
       if (list.last() == "R") {
@@ -70,10 +92,8 @@ void MainWindow::transitionEditRule(Transition *transition) {
       }
       scene->update();
     } else if (!ok && tt->write() == ' ') {
-      scene->removeItem(dynamic_cast<QGraphicsItem *>(transition));
-      tms->removeTransition(transition);
-      delete transition;
-      scene->update();
+      SCENE_TURING_MACHINE(scene)->removeTransition(
+          DRAWABLE_TURING_TRANSITION(transition));
     } else if (ok) {
       QMessageBox messageBox;
       messageBox.critical(0, "Invalid rule",
@@ -102,6 +122,7 @@ void MainWindow::stateEditLabel(State *state) {
     }
   }
   update();
+  inspectorLayout->invalidate();
 }
 
 void MainWindow::transitionInserted(Transition *transition) {

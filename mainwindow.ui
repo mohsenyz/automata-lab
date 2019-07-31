@@ -129,28 +129,18 @@
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="page">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>200</width>
-         <height>561</height>
-        </rect>
+      <widget class="QWidget" name="inspector">
+       <property name="enabled">
+        <bool>true</bool>
        </property>
-       <attribute name="label">
-        <string>Page 1</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="page_2">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
          <width>200</width>
-         <height>561</height>
+         <height>592</height>
         </rect>
        </property>
        <attribute name="label">

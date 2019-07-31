@@ -22,6 +22,7 @@ signals:
   void transitionInserted(Transition *transition);
   void transitionEditRule(Transition *transition);
   void stateEditLabel(State *state);
+  void stateSelected(State *);
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *mouseEvent);

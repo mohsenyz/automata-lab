@@ -21,8 +21,8 @@ public:
   virtual bool operator==(State &);
 
 private:
-  bool initial;
-  bool final;
+  bool initial = false;
+  bool final = false;
   QString _label;
 };
 

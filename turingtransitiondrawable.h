@@ -29,8 +29,8 @@ public:
   void updatePosition();
   QColor lineColor();
   void setLineColor(QColor);
-  short curve();
-  void setCurve(short);
+  int curve();
+  void setCurve(int);
 
 protected:
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -41,7 +41,7 @@ protected:
 private:
   void setLine(QLineF);
   QLineF line() const;
-  short _curve = 0;
+  int _curve = 0;
   QLineF _line;
   QColor _lineColor;
   QPolygonF arrowHead;
