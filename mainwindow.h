@@ -26,17 +26,16 @@ private slots:
   void stateUnselected();
   void headMoved(QPointF);
   void stateSetInitial(StateDrawable *);
-
   void on_newTransitionBtn_clicked();
   void uncheckToolBtns();
-
   void on_setInputBtn_clicked();
-
   void on_fastRunBtn_clicked();
+  void on_nextStepBtn_clicked();
 
 private:
   bool isRunning;
   void createToolboxPanels();
+  void clearRuntimeEnvironment();
   InspectorLayout *inspectorLayout;
   Ui::MainWindow *ui;
   AutomataScene *automataScene;

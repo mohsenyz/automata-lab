@@ -34,7 +34,9 @@ void TuringMachine::nextStep() {
   setCurrentState(transition->toState());
 }
 
-bool TuringMachine::isHalted() { return halted || currentState() == nullptr; }
+bool TuringMachine::isHalted() {
+  return halted || currentState() == nullptr || nextTransition() == nullptr;
+}
 
 bool TuringMachine::isAccepted() {
   return (isHalted() && currentState()->isFinal());

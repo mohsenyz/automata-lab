@@ -75,7 +75,7 @@ void TuringTransitionDrawable::paint(QPainter *painter,
                  DRAWABLE_STATE(toState())->boundingRect().center();
 
   if (*fromState() == *toState()) {
-    int width = 130 + curve() * 30;
+    int width = 100 + curve() * 30;
     _linePath = QPainterPath();
     QRectF rect = QRectF(fromPoint - QPointF(width / 2, width - 20),
                          QSizeF(width, width));
@@ -90,6 +90,8 @@ void TuringTransitionDrawable::paint(QPainter *painter,
     painter->setPen(Qt::white);
     painter->drawText(textRect, labelText,
                       QTextOption(Qt::AlignmentFlag::AlignCenter));
+
+    _linePath.addRect(rect);
     return;
   }
 
@@ -143,6 +145,8 @@ QLineF TuringTransitionDrawable::line() const { return _line; }
 
 void TuringTransitionDrawable::setLineColor(QColor lineColor) {
   _lineColor = lineColor;
+  qDebug(_lineColor.name().toStdString().c_str());
+  update();
 }
 
 void TuringTransitionDrawable::setCurve(int curve) { _curve = curve; }

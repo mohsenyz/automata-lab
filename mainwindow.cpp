@@ -5,8 +5,10 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPalette>
+#include <QPropertyAnimation>
 #include <QScrollBar>
 #include <QSpacerItem>
+#include <QTimer>
 #include <QWidget>
 #include <tapedrawable.h>
 
@@ -163,24 +165,23 @@ void MainWindow::requestSelect() {
   QApplication::setOverrideCursor(Qt::ArrowCursor);
 }
 
-void AutomataLab::MainWindow::on_moveBtn_clicked() { requestSelect(); }
+void MainWindow::on_moveBtn_clicked() { requestSelect(); }
 
-void AutomataLab::MainWindow::on_newTransitionBtn_clicked() {
+void MainWindow::on_newTransitionBtn_clicked() {
   uncheckToolBtns();
   automataScene->setCurrentMode(AutomataScene::Mode::InsertTransition);
   QApplication::setOverrideCursor(Qt::CrossCursor);
   ui->newTransitionBtn->setChecked(true);
 }
 
-void AutomataLab::MainWindow::on_setInputBtn_clicked() {
+void MainWindow::on_setInputBtn_clicked() {
+  QString input = ui->lineEdit->text().trimmed();
   if (tapeDrawable != nullptr) {
-    ui->tapeView->scene()->removeItem(tapeDrawable);
+    ui->tapeView->setBackgroundBrush(Qt::white);
+    tapeScene->removeItem(tapeDrawable);
     delete tapeDrawable;
     tapeDrawable = nullptr;
-    ui->fastRunBtn->setEnabled(false);
-    ui->nextStepBtn->setEnabled(false);
   }
-  QString input = ui->lineEdit->text().trimmed();
   if (input.contains(BLANK_CHARACTER)) {
     QMessageBox::critical(0, "Error!", "Input cannot contain blank character");
     return;
@@ -191,6 +192,7 @@ void AutomataLab::MainWindow::on_setInputBtn_clicked() {
   tapeScene->addItem(tapeDrawable);
   ui->fastRunBtn->setEnabled(true);
   ui->nextStepBtn->setEnabled(true);
+  ui->tapeView->setSceneRect(tapeScene->itemsBoundingRect());
 }
 
 void AutomataLab::MainWindow::on_fastRunBtn_clicked() {
@@ -205,16 +207,63 @@ void AutomataLab::MainWindow::on_fastRunBtn_clicked() {
   machine->setTape(tapeDrawable);
   if (machine->run()) {
     QMessageBox::information(this, "Machine", "Input accepted!");
-    QPalette palette;
-    palette.setColor(QPalette::Text, Qt::green);
-    ui->lineEdit->setPalette(palette);
+    ui->tapeView->setBackgroundBrush(QColor(129, 199, 132));
   } else {
-    QMessageBox::information(this, "Machine", "Input rejected!");
-    QPalette palette;
-    palette.setColor(QPalette::Text, Qt::red);
-    ui->lineEdit->setPalette(palette);
+    QMessageBox::critical(this, "Machine", "Input rejected!");
+    ui->tapeView->setBackgroundBrush(QColor(229, 115, 115));
   }
   tapeDrawable->update();
   tapeScene->update();
   ui->tapeView->setSceneRect(tapeScene->itemsBoundingRect());
+  clearRuntimeEnvironment();
+}
+
+void MainWindow::on_nextStepBtn_clicked() {
+  Machine *machine = SCENE_MACHINE(automataScene);
+  if (!machine->initialStateExists()) {
+    QMessageBox::critical(0, "Error!", "No initial state found!");
+    return;
+  }
+  if (!isRunning) {
+    machine->prepareRun();
+
+    isRunning = true;
+    tapeDrawable->setLocked(true);
+    ui->stopBtn->setEnabled(true);
+    ui->setInputBtn->setEnabled(false);
+
+    machine->setTape(tapeDrawable);
+    DRAWABLE_STATE(machine->currentState())
+        ->setBackgroundColor(QColor(255, 193, 7));
+  } else {
+    DRAWABLE_STATE(machine->currentState())
+        ->setBackgroundColor(QColor(0, 188, 212));
+    machine->nextStep();
+    DRAWABLE_STATE(machine->currentState())
+        ->setBackgroundColor(QColor(255, 193, 7));
+    if (machine->isHalted()) {
+      if (machine->isAccepted()) {
+        QMessageBox::information(this, "Machine", "Input accepted!");
+        ui->tapeView->setBackgroundBrush(QColor(129, 199, 132));
+      } else {
+        QMessageBox::critical(this, "Machine", "Input rejected!");
+        ui->tapeView->setBackgroundBrush(QColor(229, 115, 115));
+      }
+      DRAWABLE_STATE(machine->currentState())
+          ->setBackgroundColor(QColor(0, 188, 212));
+      clearRuntimeEnvironment();
+    }
+  }
+  ui->tapeView->setSceneRect(tapeScene->itemsBoundingRect());
+  tapeDrawable->update();
+  automataScene->update();
+}
+
+void MainWindow::clearRuntimeEnvironment() {
+
+  isRunning = false;
+  ui->stopBtn->setEnabled(false);
+  ui->fastRunBtn->setEnabled(false);
+  ui->nextStepBtn->setEnabled(false);
+  ui->setInputBtn->setEnabled(true);
 }

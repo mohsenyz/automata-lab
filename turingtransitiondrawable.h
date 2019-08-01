@@ -28,9 +28,9 @@ public:
   QPainterPath shape() const override;
   void updatePosition();
   QColor lineColor();
-  void setLineColor(QColor);
   int curve();
   void setCurve(int);
+  void setLineColor(QColor);
 
 protected:
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
