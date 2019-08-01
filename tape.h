@@ -16,11 +16,14 @@ public:
   virtual void moveRight();
   virtual void moveLeft();
   virtual void write(QChar);
+  unsigned int currentIndex();
+  unsigned int inputSize() const;
   QString toString();
 
 protected:
   std::deque<QChar> tape;
-  unsigned int currentIndex = 0;
+  unsigned int _currentIndex = 0;
+  unsigned int _inputSize = 0;
 };
 
 } // namespace AutomataLab

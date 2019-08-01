@@ -1,63 +1,54 @@
-﻿#include "turingtransitiondrawable.h"
+#include "dfatransitiondrawable.h"
 #include "ui_utils.h"
 using namespace AutomataLab;
 
 #include <cmath>
 #include <qmath.h>
 
-TuringTransitionDrawable::TuringTransitionDrawable(
-    StateDrawable *startState, StateDrawable *endState,
-    std::vector<QChar> acceptedInputs, QChar write, Direction direction)
-    : TuringTransition(startState, endState, acceptedInputs, write, direction),
-      QGraphicsItem() {
+DFATransitionDrawable::DFATransitionDrawable(StateDrawable *startState,
+                                             StateDrawable *endState,
+                                             std::vector<QChar> acceptedInputs)
+    : DFATransition(startState, endState, acceptedInputs), QGraphicsItem() {
   setZValue(5);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setLineColor(Qt::black);
 }
 
-TuringTransitionDrawable::TuringTransitionDrawable(StateDrawable *startState,
-                                                   StateDrawable *endState,
-                                                   QChar acceptedInput,
-                                                   QChar write,
-                                                   Direction direction)
-    : TuringTransition(startState, endState, acceptedInput, write, direction),
-      QGraphicsItem() {
+DFATransitionDrawable::DFATransitionDrawable(StateDrawable *startState,
+                                             StateDrawable *endState,
+                                             QChar acceptedInput)
+    : DFATransition(startState, endState, acceptedInput), QGraphicsItem() {
   setZValue(5);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setLineColor(Qt::black);
 }
 
-int TuringTransitionDrawable::type() const {
+int DFATransitionDrawable::type() const {
   return AutomataScene::ItemType::TransitionItem;
 }
 
-QRectF TuringTransitionDrawable::boundingRect() const {
+QRectF DFATransitionDrawable::boundingRect() const {
   qreal extra = 4;
   return _linePath.boundingRect().normalized().adjusted(-extra, -extra, extra,
                                                         extra);
 }
 
-QPainterPath TuringTransitionDrawable::shape() const { return _linePath; }
+QPainterPath DFATransitionDrawable::shape() const { return _linePath; }
 
-void TuringTransitionDrawable::updatePosition() {
+void DFATransitionDrawable::updatePosition() {
   QLineF line(mapFromItem(DRAWABLE_STATE(fromState()), 0, 0),
               mapFromItem(DRAWABLE_STATE(toState()), 0, 0));
   setLine(line);
 }
 
-void TuringTransitionDrawable::paint(QPainter *painter,
-                                     const QStyleOptionGraphicsItem *option,
-                                     QWidget *) {
+void DFATransitionDrawable::paint(QPainter *painter,
+                                  const QStyleOptionGraphicsItem *option,
+                                  QWidget *) {
   if (DRAWABLE_STATE(fromState())
           ->collidesWithItem(DRAWABLE_STATE(toState())) &&
       !(*fromState() == *toState()))
     return;
-  QString direction = "L";
-  if (TuringTransition::direction() == Direction::RIGHT) {
-    direction = "R";
-  }
-  QString labelText =
-      QString(acceptInputs()[0]) + "," + QString(write()) + "," + direction;
+  QString labelText = QString(acceptInputs()[0]);
   QColor color = lineColor();
   if (option->state & QStyle::State_Selected) {
     color = QColor(0, 151, 167);
@@ -139,28 +130,27 @@ void TuringTransitionDrawable::paint(QPainter *painter,
                     QTextOption(Qt::AlignmentFlag::AlignCenter));
 }
 
-void TuringTransitionDrawable::setLine(QLineF line) { _line = line; }
+void DFATransitionDrawable::setLine(QLineF line) { _line = line; }
 
-QLineF TuringTransitionDrawable::line() const { return _line; }
+QLineF DFATransitionDrawable::line() const { return _line; }
 
-void TuringTransitionDrawable::setLineColor(QColor lineColor) {
+void DFATransitionDrawable::setLineColor(QColor lineColor) {
   _lineColor = lineColor;
   update();
 }
 
-void TuringTransitionDrawable::setCurve(int curve) { _curve = curve; }
+void DFATransitionDrawable::setCurve(int curve) { _curve = curve; }
 
-int TuringTransitionDrawable::curve() { return _curve; }
+int DFATransitionDrawable::curve() { return _curve; }
 
-void TuringTransitionDrawable::mousePressEvent(
-    QGraphicsSceneMouseEvent *event) {
+void DFATransitionDrawable::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   update();
   QGraphicsItem::mousePressEvent(event);
 }
 
-void TuringTransitionDrawable::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void DFATransitionDrawable::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   update();
   QGraphicsItem::mouseMoveEvent(event);
 }
 
-QColor TuringTransitionDrawable::lineColor() { return _lineColor; }
+QColor DFATransitionDrawable::lineColor() { return _lineColor; }

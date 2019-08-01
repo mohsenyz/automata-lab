@@ -28,7 +28,9 @@ SOURCES += \
         automatascene.cpp \
         dfamachine.cpp \
         dfamachine_test.cpp \
+        dfamachinescene.cpp \
         dfatransition.cpp \
+        dfatransitiondrawable.cpp \
         inspectorlayout.cpp \
         machine.cpp \
         main.cpp \
@@ -51,7 +53,9 @@ HEADERS += \
         automatascene.h \
         dfamachine.h \
         dfamachine_test.h \
+        dfamachinescene.h \
         dfatransition.h \
+        dfatransitiondrawable.h \
         inspectorlayout.h \
         machine.h \
         mainwindow.h \

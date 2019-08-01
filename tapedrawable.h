@@ -1,6 +1,7 @@
 #ifndef TAPEDRAWABLE_H
 #define TAPEDRAWABLE_H
 
+#include "automatascene.h"
 #include "tape.h"
 #include <QGraphicsItem>
 
@@ -8,7 +9,7 @@ namespace AutomataLab {
 class TapeDrawable : public QObject, public Tape, public QGraphicsItem {
   Q_OBJECT
 public:
-  explicit TapeDrawable(QString);
+  explicit TapeDrawable(QString, MachineType type);
   int type() const override;
   QRectF boundingRect() const override;
   void moveRight() override;
@@ -27,6 +28,7 @@ protected:
 
 private:
   bool _isLocked;
+  MachineType _machineType;
 };
 
 } // namespace AutomataLab

@@ -83,7 +83,7 @@ void DFAMachineTest::test_run2() {
   machine->prepareRun();
   Tape tape4("1111100000011111");
   machine->setTape(&tape4);
-  QCOMPARE(machine->run(), true);
+  QCOMPARE(machine->run(), false);
 }
 
 void DFAMachineTest::test_stepByStepRun1() {}

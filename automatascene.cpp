@@ -18,6 +18,8 @@ AutomataScene::Mode AutomataScene::currentMode() const { return _currentMode; }
 
 void AutomataScene::setCurrentMode(Mode mode) { _currentMode = mode; }
 
+unsigned int AutomataScene::stateIndex() { return _stateIndex++; }
+
 void AutomataScene::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *mouseEvent) {
   if (mouseEvent->button() == Qt::LeftButton && !selectedItems().isEmpty()) {

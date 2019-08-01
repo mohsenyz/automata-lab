@@ -9,24 +9,27 @@ Tape::Tape(QString input) {
       throw std::runtime_error("Tape cannot contain blank character (#)");
     tape.push_back(input[i]);
   }
-  currentIndex = 0;
+  _currentIndex = 0;
+  _inputSize = input.size();
 }
 
-QChar Tape::read() { return tape[currentIndex]; }
+QChar Tape::read() { return tape[_currentIndex]; }
 
 void Tape::moveRight() {
-  currentIndex++;
-  if (currentIndex >= tape.size())
+  _currentIndex++;
+  if (_currentIndex >= tape.size())
     tape.push_back(BLANK_CHARACTER);
 }
 
 void Tape::moveLeft() {
-  if (currentIndex == 0) {
+  if (_currentIndex == 0) {
     tape.push_front(BLANK_CHARACTER);
   } else {
-    currentIndex--;
+    _currentIndex--;
   }
 }
+
+unsigned int Tape::currentIndex() { return _currentIndex; }
 
 QString Tape::toString() {
   QString string = "";
@@ -36,4 +39,6 @@ QString Tape::toString() {
   return string;
 }
 
-void Tape::write(QChar character) { tape[currentIndex] = character; }
+unsigned int Tape::inputSize() const { return _inputSize; }
+
+void Tape::write(QChar character) { tape[_currentIndex] = character; }

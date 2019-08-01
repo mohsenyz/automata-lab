@@ -1,4 +1,5 @@
 ﻿#include "mainwindow.h"
+#include "dfamachinescene.h"
 #include "ui_utils.h"
 #include <QCheckBox>
 #include <QInputDialog>
@@ -19,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
   ui->statusBar->showMessage("Welcome to auomata lab, You can read more about "
                              "automata lab in help tab");
-  automataScene = new TuringMachineScene(this);
+  automataScene = new DFAMachineScene(this);
   connect(automataScene, SIGNAL(requestSelect()), this, SLOT(requestSelect()));
   connect(automataScene, SIGNAL(stateUnselected()), this,
           SLOT(stateUnselected()));
@@ -123,6 +124,34 @@ void MainWindow::transitionEditRule(Transition *transition) {
                             "accpetChar,writeChar,direction. ex : 1,0,R");
       transitionInserted(transition);
     }
+  } else if (automataScene->machineType() == DFA) {
+    DFAMachineScene *tms = dynamic_cast<DFAMachineScene *>(automataScene);
+    DFATransition *tt = dynamic_cast<DFATransition *>(transition);
+    bool ok;
+    QString labelText = QString(tt->acceptInputs()[0]);
+    QString text = QInputDialog::getText(this, tr("Transition rule"),
+                                         tr("Transition rule (Accept):"),
+                                         QLineEdit::Normal, labelText, &ok);
+    if (!text.trimmed().isEmpty() && ok) {
+      tt->setAcceptInput(text.trimmed()[0]);
+      if (tms->transitionExists(tt)) {
+        QMessageBox::critical(0, "Error !",
+                              "A transition from state : \"" +
+                                  tt->fromState()->label() +
+                                  "\" with accept character : \"" +
+                                  tt->acceptInputs()[0] + "\" already exists!");
+        transitionInserted(transition);
+      }
+      automataScene->update();
+    } else if (!ok) {
+      SCENE_DFA_MACHINE(automataScene)
+          ->removeTransition(DRAWABLE_DFA_TRANSITION(transition));
+    } else if (ok) {
+      QMessageBox::critical(0, "Invalid rule",
+                            "Rules must be in this format : "
+                            "accpetCharacter . ex : 1");
+      transitionInserted(transition);
+    }
   }
 }
 
@@ -177,6 +206,7 @@ void MainWindow::on_newTransitionBtn_clicked() {
 void MainWindow::on_setInputBtn_clicked() {
   QString input = ui->lineEdit->text().trimmed();
   if (tapeDrawable != nullptr) {
+
     ui->tapeView->setBackgroundBrush(Qt::white);
     tapeScene->removeItem(tapeDrawable);
     delete tapeDrawable;
@@ -186,7 +216,7 @@ void MainWindow::on_setInputBtn_clicked() {
     QMessageBox::critical(0, "Error!", "Input cannot contain blank character");
     return;
   }
-  tapeDrawable = new TapeDrawable(input);
+  tapeDrawable = new TapeDrawable(input, SCENE_MACHINE(automataScene)->type());
   connect(tapeDrawable, SIGNAL(headMoved(QPointF)), this,
           SLOT(headMoved(QPointF)));
   tapeScene->addItem(tapeDrawable);

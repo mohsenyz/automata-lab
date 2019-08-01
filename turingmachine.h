@@ -9,7 +9,7 @@ class TuringMachine : public Machine {
 public:
   using Machine::Machine;
   ~TuringMachine();
-  int type();
+  MachineType type();
   std::vector<TuringTransition *> findAllTransitions(State *);
   std::vector<TuringTransition *> findAllTransitionsBetween(State *, State *);
   void nextStep();

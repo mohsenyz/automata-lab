@@ -33,7 +33,7 @@ public:
   void virtual nextStep() = 0;
   Transition *nextTransition();
   State *currentState();
-  virtual int type() = 0;
+  virtual MachineType type() = 0;
   virtual bool isHalted() = 0;
   virtual bool isAccepted() = 0;
   virtual bool run() = 0;

@@ -3,7 +3,7 @@ using namespace AutomataLab;
 
 TuringMachine::~TuringMachine() {}
 
-int TuringMachine::type() { return TURING; }
+MachineType TuringMachine::type() { return TURING; }
 
 std::vector<TuringTransition *>
 TuringMachine::findAllTransitions(State *state) {

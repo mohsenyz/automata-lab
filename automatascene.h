@@ -26,11 +26,13 @@ signals:
   void stateUnselected();
 
 protected:
+  unsigned int stateIndex();
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
 
 private:
   Mode _currentMode;
   MachineType _machineType;
+  unsigned int _stateIndex = 0;
 };
 
 } // namespace AutomataLab

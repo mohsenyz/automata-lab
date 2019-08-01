@@ -6,12 +6,14 @@
 #include <cmath>
 using namespace AutomataLab;
 
-TapeDrawable::TapeDrawable(QString input) : Tape(input) {}
+TapeDrawable::TapeDrawable(QString input, MachineType machineType)
+    : Tape(input), _machineType(machineType) {}
 
 int TapeDrawable::type() const { return AutomataScene::ItemType::TapeItem; }
 
 QRectF TapeDrawable::boundingRect() const {
-  return QRectF(QPointF(0, 0), QSizeF(50 * tape.size(), 50));
+  int tapeSize = _machineType == DFA ? inputSize() : tape.size();
+  return QRectF(QPointF(0, 0), QSizeF(50 * tapeSize, 50));
 }
 
 void TapeDrawable::paint(QPainter *painter,
@@ -25,11 +27,12 @@ void TapeDrawable::paint(QPainter *painter,
   const int blockWidth = 50;
   const int blockHeight = 50;
   const int borderWidth = 3;
+  int tapeSize = _machineType == DFA ? inputSize() : tape.size();
   painter->setPen(QPen(QBrush(Qt::black), borderWidth));
-  for (unsigned int i = 0; i < tape.size(); i++) {
+  for (unsigned int i = 0; i < tapeSize; i++) {
     auto block = tape[i];
     QRectF rect(QPointF(startWidth, 0), QSizeF(blockWidth, blockHeight));
-    if (i == currentIndex) {
+    if (i == currentIndex()) {
       painter->setPen(QPen(QBrush(QColor(255, 193, 7)), borderWidth));
       QRectF ellipseRect = rect;
       ellipseRect.setSize(rect.size() - QSizeF(10, 10));
@@ -68,7 +71,7 @@ void TapeDrawable::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (isLocked())
     return;
   double xPos = event->scenePos().x();
-  currentIndex = floor(xPos / 50.0);
-  emit headMoved(QPointF(currentIndex * 50 + 25, 0));
+  _currentIndex = floor(xPos / 50.0);
+  emit headMoved(QPointF(_currentIndex * 50 + 25, 0));
   update();
 }

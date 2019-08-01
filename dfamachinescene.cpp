@@ -1,4 +1,4 @@
-#include "turingmachinescene.h"
+#include "dfamachinescene.h"
 #include "statedrawable.h"
 #include "ui_utils.h"
 #include <QApplication>
@@ -7,31 +7,31 @@
 #include <cmath>
 using namespace AutomataLab;
 
-TuringMachineScene::TuringMachineScene(QObject *parent)
-    : AutomataScene(parent, MachineType::TURING) {}
+DFAMachineScene::DFAMachineScene(QObject *parent)
+    : AutomataScene(parent, MachineType::DFA) {}
 
-void TuringMachineScene::addState(StateDrawable *state, QPointF position) {
-  TuringMachine::addState(state);
+void DFAMachineScene::addState(StateDrawable *state, QPointF position) {
+  DFAMachine::addState(state);
   state->setPos(position - state->boundingRect().center());
   addItem(state);
 }
 
-void TuringMachineScene::addTransition(TuringTransitionDrawable *transition) {
-  TuringMachine::addTransition(transition);
+void DFAMachineScene::addTransition(DFATransitionDrawable *transition) {
+  DFAMachine::addTransition(transition);
   addItem(transition);
   recurveTransitions(transition->fromState(), transition->toState());
   update();
 }
 
-void TuringMachineScene::recurveTransitions(State *fromState, State *toState) {
-  std::vector<TuringTransition *> transitions =
-      TuringMachine::findAllTransitionsBetween(fromState, toState);
+void DFAMachineScene::recurveTransitions(State *fromState, State *toState) {
+  std::vector<DFATransition *> transitions =
+      DFAMachine::findAllTransitionsBetween(fromState, toState);
   int curve = 0;
   for (auto tr : transitions) {
-    TuringTransitionDrawable *transition =
-        dynamic_cast<TuringTransitionDrawable *>(tr);
+    DFATransitionDrawable *transition =
+        dynamic_cast<DFATransitionDrawable *>(tr);
     if (transitions.size() > 1) {
-      TuringTransition *prevTransition = transitions.at(transitions.size() - 2);
+      DFATransition *prevTransition = transitions.at(transitions.size() - 2);
       if (transition->fromState() != prevTransition->fromState()) {
         curve *= -1;
       }
@@ -52,7 +52,7 @@ void TuringMachineScene::recurveTransitions(State *fromState, State *toState) {
   }
 }
 
-void TuringMachineScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+void DFAMachineScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if (!selectedItems().isEmpty()) {
     update();
   }
@@ -64,18 +64,18 @@ void TuringMachineScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   AutomataScene::mouseMoveEvent(mouseEvent);
 }
 
-void TuringMachineScene::mouseReleaseEvent(
-    QGraphicsSceneMouseEvent *mouseEvent) {
+int stateIndex = 0;
+
+void DFAMachineScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QGraphicsScene::mouseReleaseEvent(mouseEvent);
   if (currentMode() == Mode::InsertTransition && tempLine != nullptr) {
     QList<QGraphicsItem *> list = items(mouseEvent->scenePos());
-    TuringTransitionDrawable *ttd = nullptr;
+    DFATransitionDrawable *ttd = nullptr;
     if (!list.empty() && list.first()->type() == ItemType::StateItem) {
       StateDrawable *fromState =
                         DRAWABLE_STATE(items(tempLine->line().p1()).first()),
                     *toState = DRAWABLE_STATE(list.first());
-      ttd = new TuringTransitionDrawable(fromState, toState, ' ', ' ',
-                                         TuringTransition::RIGHT);
+      ttd = new DFATransitionDrawable(fromState, toState, ' ');
       addTransition(ttd);
       update();
     }
@@ -87,7 +87,7 @@ void TuringMachineScene::mouseReleaseEvent(
   }
 }
 
-void TuringMachineScene::keyPressEvent(QKeyEvent *keyEvent) {
+void DFAMachineScene::keyPressEvent(QKeyEvent *keyEvent) {
   switch (keyEvent->key()) {
   case Qt::Key_Delete:
     if (!selectedItems().isEmpty()) {
@@ -100,35 +100,34 @@ void TuringMachineScene::keyPressEvent(QKeyEvent *keyEvent) {
 
       // Delete transition
       if (selectedItem->type() == ItemType::TransitionItem) {
-        removeTransition(DRAWABLE_TURING_TRANSITION(selectedItem));
+        removeTransition(DRAWABLE_DFA_TRANSITION(selectedItem));
       }
     }
     break;
   }
 }
 
-void TuringMachineScene::removeTransition(
-    TuringTransitionDrawable *transition) {
+void DFAMachineScene::removeTransition(DFATransitionDrawable *transition) {
   State *fromState = transition->fromState(), *toState = transition->toState();
   removeItem(transition);
-  TuringMachine::removeTransition(transition);
+  DFAMachine::removeTransition(transition);
   delete transition;
   recurveTransitions(fromState, toState);
   update();
 }
 
-void TuringMachineScene::removeState(StateDrawable *state) {
-  std::vector<TuringTransition *> list = findAllTransitions(state);
+void DFAMachineScene::removeState(StateDrawable *state) {
+  std::vector<DFATransition *> list = findAllTransitions(state);
   for (auto transition : list) {
-    removeTransition(DRAWABLE_TURING_TRANSITION(transition));
+    removeTransition(DRAWABLE_DFA_TRANSITION(transition));
   }
   removeItem(state);
-  TuringMachine::removeState(state);
+  DFAMachine::removeState(state);
   delete state;
   update();
 }
 
-void TuringMachineScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+void DFAMachineScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if (currentMode() == Mode::InsertTransition) {
     QList<QGraphicsItem *> list = items(mouseEvent->scenePos());
     if (list.size() > 0) {
