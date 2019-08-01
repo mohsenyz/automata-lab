@@ -91,9 +91,6 @@ void Machine::prepareRun() {
   if (_currentState == nullptr) {
     throw std::runtime_error("No start state found");
   }
-  if (transitions.size() == 0) {
-    throw std::runtime_error("No transition found");
-  }
 }
 
 void Machine::clearTape() { delete _tape; }

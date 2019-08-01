@@ -4,6 +4,7 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPalette>
 #include <QScrollBar>
 #include <QSpacerItem>
 #include <QWidget>
@@ -34,12 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
                                    QPainter::SmoothPixmapTransform);
   ui->graphicsView->centerOn(0, 0);
 
-  QGraphicsScene *tapeScene = new QGraphicsScene(this);
-  //  TapeDrawable *tapeDrawable =
-  //      new TapeDrawable("1110202020196785867545121176476034");
-  //  connect(tapeDrawable, SIGNAL(headMoved(QPointF)), this,
-  //          SLOT(headMoved(QPointF)));
-  //  tapeScene->addItem(tapeDrawable);
+  tapeScene = new QGraphicsScene(this);
   ui->tapeView->setScene(tapeScene);
   ui->tapeView->setRenderHints(QPainter::Antialiasing |
                                QPainter::SmoothPixmapTransform);
@@ -174,4 +170,51 @@ void AutomataLab::MainWindow::on_newTransitionBtn_clicked() {
   automataScene->setCurrentMode(AutomataScene::Mode::InsertTransition);
   QApplication::setOverrideCursor(Qt::CrossCursor);
   ui->newTransitionBtn->setChecked(true);
+}
+
+void AutomataLab::MainWindow::on_setInputBtn_clicked() {
+  if (tapeDrawable != nullptr) {
+    ui->tapeView->scene()->removeItem(tapeDrawable);
+    delete tapeDrawable;
+    tapeDrawable = nullptr;
+    ui->fastRunBtn->setEnabled(false);
+    ui->nextStepBtn->setEnabled(false);
+  }
+  QString input = ui->lineEdit->text().trimmed();
+  if (input.contains(BLANK_CHARACTER)) {
+    QMessageBox::critical(0, "Error!", "Input cannot contain blank character");
+    return;
+  }
+  tapeDrawable = new TapeDrawable(input);
+  connect(tapeDrawable, SIGNAL(headMoved(QPointF)), this,
+          SLOT(headMoved(QPointF)));
+  tapeScene->addItem(tapeDrawable);
+  ui->fastRunBtn->setEnabled(true);
+  ui->nextStepBtn->setEnabled(true);
+}
+
+void AutomataLab::MainWindow::on_fastRunBtn_clicked() {
+  Machine *machine = SCENE_MACHINE(automataScene);
+  if (!machine->initialStateExists()) {
+    QMessageBox::critical(0, "Error!", "No initial state found!");
+    return;
+  }
+  isRunning = true;
+  tapeDrawable->setLocked(true);
+  machine->prepareRun();
+  machine->setTape(tapeDrawable);
+  if (machine->run()) {
+    QMessageBox::information(this, "Machine", "Input accepted!");
+    QPalette palette;
+    palette.setColor(QPalette::Text, Qt::green);
+    ui->lineEdit->setPalette(palette);
+  } else {
+    QMessageBox::information(this, "Machine", "Input rejected!");
+    QPalette palette;
+    palette.setColor(QPalette::Text, Qt::red);
+    ui->lineEdit->setPalette(palette);
+  }
+  tapeDrawable->update();
+  tapeScene->update();
+  ui->tapeView->setSceneRect(tapeScene->itemsBoundingRect());
 }

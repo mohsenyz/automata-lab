@@ -14,6 +14,8 @@ public:
   void moveRight() override;
   void moveLeft() override;
   void write(QChar) override;
+  bool isLocked();
+  void setLocked(bool locked);
 
 signals:
   void headMoved(QPointF);
@@ -22,6 +24,9 @@ protected:
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = 0) override;
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+
+private:
+  bool _isLocked;
 };
 
 } // namespace AutomataLab

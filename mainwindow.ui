@@ -190,14 +190,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="setInputBtn">
           <property name="text">
            <string>Set input</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="fastRunBtn">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -207,7 +207,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="nextStepBtn">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -217,7 +217,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="stopBtn">
           <property name="enabled">
            <bool>false</bool>
           </property>

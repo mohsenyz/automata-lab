@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include "inspectorlayout.h"
 #include "machine.h"
+#include "tapedrawable.h"
 #include "turingmachinescene.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
@@ -29,12 +30,18 @@ private slots:
   void on_newTransitionBtn_clicked();
   void uncheckToolBtns();
 
+  void on_setInputBtn_clicked();
+
+  void on_fastRunBtn_clicked();
+
 private:
+  bool isRunning;
   void createToolboxPanels();
   InspectorLayout *inspectorLayout;
   Ui::MainWindow *ui;
   AutomataScene *automataScene;
   QGraphicsScene *tapeScene;
+  TapeDrawable *tapeDrawable = nullptr;
 };
 } // namespace AutomataLab
 

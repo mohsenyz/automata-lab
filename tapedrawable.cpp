@@ -60,7 +60,13 @@ void TapeDrawable::moveLeft() {
   update();
 }
 
+bool TapeDrawable::isLocked() { return _isLocked; }
+
+void TapeDrawable::setLocked(bool locked) { _isLocked = locked; }
+
 void TapeDrawable::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+  if (isLocked())
+    return;
   double xPos = event->scenePos().x();
   currentIndex = floor(xPos / 50.0);
   emit headMoved(QPointF(currentIndex * 50 + 25, 0));
