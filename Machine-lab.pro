@@ -35,6 +35,7 @@ SOURCES += \
         machine.cpp \
         main.cpp \
         mainwindow.cpp \
+        multiplerunlayout.cpp \
         state.cpp \
         statedrawable.cpp \
         tape.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
         inspectorlayout.h \
         machine.h \
         mainwindow.h \
+        multiplerunlayout.h \
         state.h \
         statedrawable.h \
         tape.h \

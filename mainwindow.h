@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include "inspectorlayout.h"
 #include "machine.h"
+#include "multiplerunlayout.h"
 #include "tapedrawable.h"
 #include "turingmachinescene.h"
 #include "ui_mainwindow.h"
@@ -15,7 +16,7 @@ public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
-private slots:
+public slots:
   void on_newStateBtn_clicked();
   void on_moveBtn_clicked();
   void requestSelect();
@@ -31,12 +32,18 @@ private slots:
   void on_setInputBtn_clicked();
   void on_fastRunBtn_clicked();
   void on_nextStepBtn_clicked();
+  void on_file_newAction();
+  void on_file_saveAction();
+  void on_file_saveAsAction();
+  void on_file_saveAsImageAction();
 
 private:
   bool isRunning;
   void createToolboxPanels();
   void clearRuntimeEnvironment();
+  void initMenuActions();
   InspectorLayout *inspectorLayout;
+  MultipleRunLayout *multipleRunLayout;
   Ui::MainWindow *ui;
   AutomataScene *automataScene;
   QGraphicsScene *tapeScene;

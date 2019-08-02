@@ -32,7 +32,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0,7,2" columnstretch="1,5,1">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,7,2" columnstretch="1,5,4">
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -121,7 +121,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>300</width>
         <height>16777215</height>
        </size>
       </property>
@@ -139,7 +139,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>200</width>
+         <width>300</width>
          <height>592</height>
         </rect>
        </property>
@@ -241,7 +241,7 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuMachine_lab">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
@@ -255,9 +255,8 @@
     <property name="title">
      <string>Run</string>
     </property>
-    <addaction name="actionFast_run"/>
-    <addaction name="actionStep_by_step"/>
     <addaction name="actionMultiple_run"/>
+    <addaction name="actionValidate_automata"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -282,7 +281,7 @@
     <addaction name="actionEmbed_another_machine"/>
     <addaction name="actionCombine_machine"/>
    </widget>
-   <addaction name="menuMachine_lab"/>
+   <addaction name="menuFile"/>
    <addaction name="menuRun"/>
    <addaction name="menuView"/>
    <addaction name="menuTools"/>
@@ -330,7 +329,7 @@
     <string>Fast run</string>
    </property>
   </action>
-  <action name="actionStep_by_step">
+  <action name="action">
    <property name="text">
     <string>Step by step</string>
    </property>
@@ -385,8 +384,36 @@
     <string>Combine machine</string>
    </property>
   </action>
+  <action name="actionValidate_automata">
+   <property name="text">
+    <string>Validate automata</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionNew</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_file_newAction()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>578</x>
+     <y>350</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>on_file_newAction()</slot>
+  <slot>on_file_saveAction()</slot>
+  <slot>on_file_saveAsActio()</slot>
+  <slot>on_file_saveAsImageAction()</slot>
+ </slots>
 </ui>

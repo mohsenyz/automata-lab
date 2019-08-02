@@ -17,10 +17,38 @@ using namespace AutomataLab;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
+
+  QMessageBox msgBox;
+  msgBox.setText("Select an automata to draw:");
+  QPushButton *dfaButton = msgBox.addButton(tr("DFA"), QMessageBox::ActionRole);
+  QPushButton *turingButton =
+      msgBox.addButton(tr("Turing"), QMessageBox::ActionRole);
+  msgBox.setStandardButtons(QMessageBox::Cancel);
+
+  int ret = msgBox.exec();
+
+  if (msgBox.clickedButton() == dfaButton) {
+    automataScene = new DFAMachineScene(this);
+    setWindowTitle(tr("AutomataLab - DFA"));
+  } else if (msgBox.clickedButton() == turingButton) {
+    automataScene = new TuringMachineScene(this);
+    setWindowTitle(tr("AutomataLab - Turing"));
+  }
+
+  if (ret == QMessageBox::Cancel) {
+    QTimer::singleShot(0, this, SLOT(close()));
+    return;
+  }
+
   ui->setupUi(this);
+  if (msgBox.clickedButton() == dfaButton) {
+    setWindowTitle(tr("AutomataLab - DFA"));
+  } else if (msgBox.clickedButton() == turingButton) {
+    setWindowTitle(tr("AutomataLab - Turing"));
+  }
+
   ui->statusBar->showMessage("Welcome to auomata lab, You can read more about "
                              "automata lab in help tab");
-  automataScene = new DFAMachineScene(this);
   connect(automataScene, SIGNAL(requestSelect()), this, SLOT(requestSelect()));
   connect(automataScene, SIGNAL(stateUnselected()), this,
           SLOT(stateUnselected()));
@@ -46,6 +74,8 @@ MainWindow::MainWindow(QWidget *parent)
   createToolboxPanels();
 }
 
+void MainWindow::initMenuActions() {}
+
 void MainWindow::headMoved(QPointF pos) {}
 
 void MainWindow::stateSetInitial(StateDrawable *state) {
@@ -65,7 +95,11 @@ void MainWindow::createToolboxPanels() {
           SLOT(stateSetInitial(StateDrawable *)));
   ui->toolBox->removeItem(0);
   inspectorLayout->attach(ui->toolBox);
-  ui->toolBox->insertItem(1, new QWidget(this), "Multiple run");
+
+  multipleRunLayout = new MultipleRunLayout(this, SCENE_MACHINE(automataScene));
+  ui->toolBox->removeItem(1);
+  multipleRunLayout->attach(ui->toolBox);
+  multipleRunLayout->focus();
 }
 
 void MainWindow::uncheckToolBtns() {
@@ -289,6 +323,17 @@ void MainWindow::on_nextStepBtn_clicked() {
   automataScene->update();
 }
 
+void MainWindow::on_file_newAction() {
+  MainWindow *newMainWindow = new MainWindow();
+  newMainWindow->setAttribute(Qt::WA_DeleteOnClose);
+  newMainWindow->show();
+}
+
+void MainWindow::on_file_saveAction() {}
+
+void MainWindow::on_file_saveAsAction() {}
+
+void MainWindow::on_file_saveAsImageAction() {}
 void MainWindow::clearRuntimeEnvironment() {
 
   isRunning = false;
