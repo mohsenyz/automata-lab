@@ -2,6 +2,7 @@
 #define AUTOMATASCENE_H
 #include "machine.h"
 #include "statedrawable.h"
+#include <QFile>
 #include <QGraphicsScene>
 
 namespace AutomataLab {
@@ -16,6 +17,8 @@ public:
   void setMachineType(MachineType);
   Mode currentMode() const;
   void setCurrentMode(Mode);
+  void saveTo(QString);
+  void loadFromJson(QJsonObject);
 
 signals:
   void requestSelect();

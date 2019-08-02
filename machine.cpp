@@ -106,3 +106,7 @@ void Machine::setCurrentState(State *state) { _currentState = state; }
 State *Machine::currentState() { return _currentState; }
 
 void Machine::setTape(Tape *input) { _tape = input; }
+
+std::vector<State *> Machine::allStates() { return states; }
+
+std::vector<Transition *> Machine::allTransitions() { return transitions; }

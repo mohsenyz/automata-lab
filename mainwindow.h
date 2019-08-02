@@ -15,7 +15,8 @@ class MainWindow : public QMainWindow {
 public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
-
+  explicit MainWindow(QString fileName, QWidget *parent = nullptr);
+  void init();
 public slots:
   void on_newStateBtn_clicked();
   void on_moveBtn_clicked();
@@ -33,15 +34,16 @@ public slots:
   void on_fastRunBtn_clicked();
   void on_nextStepBtn_clicked();
   void on_file_newAction();
+  void on_file_openAction();
   void on_file_saveAction();
   void on_file_saveAsAction();
   void on_file_saveAsImageAction();
 
 private:
+  QString saveFileName = "";
   bool isRunning;
   void createToolboxPanels();
   void clearRuntimeEnvironment();
-  void initMenuActions();
   InspectorLayout *inspectorLayout;
   MultipleRunLayout *multipleRunLayout;
   Ui::MainWindow *ui;

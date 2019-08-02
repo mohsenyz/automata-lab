@@ -2,7 +2,10 @@
 #include "dfamachinescene.h"
 #include "ui_utils.h"
 #include <QCheckBox>
+#include <QFileDialog>
 #include <QInputDialog>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPalette>
@@ -39,11 +42,14 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer::singleShot(0, this, SLOT(close()));
     return;
   }
+  init();
+}
 
+void MainWindow::init() {
   ui->setupUi(this);
-  if (msgBox.clickedButton() == dfaButton) {
+  if (SCENE_MACHINE(automataScene)->type() == DFA) {
     setWindowTitle(tr("AutomataLab - DFA"));
-  } else if (msgBox.clickedButton() == turingButton) {
+  } else {
     setWindowTitle(tr("AutomataLab - Turing"));
   }
 
@@ -73,8 +79,6 @@ MainWindow::MainWindow(QWidget *parent)
   ui->tapeView->centerOn(0, 0);
   createToolboxPanels();
 }
-
-void MainWindow::initMenuActions() {}
 
 void MainWindow::headMoved(QPointF pos) {}
 
@@ -329,9 +333,53 @@ void MainWindow::on_file_newAction() {
   newMainWindow->show();
 }
 
-void MainWindow::on_file_saveAction() {}
+void MainWindow::on_file_saveAction() {
+  if (saveFileName.isEmpty()) {
+    saveFileName = QFileDialog::getSaveFileName(
+        this, tr("Save machine"), "/home/ubuntu/automata.aml",
+        tr("AutomataLab file (*.aml))"));
+    if (saveFileName.isEmpty()) {
+      return;
+    }
+  }
+  QFile file(saveFileName);
+  automataScene->saveTo(saveFileName);
+}
 
 void MainWindow::on_file_saveAsAction() {}
+
+void MainWindow::on_file_openAction() {
+  QString fileName =
+      QFileDialog::getOpenFileName(this, tr("Open machine"), "/home/ubuntu",
+                                   tr("AutomataLab file (*.aml) "));
+  if (fileName.isEmpty()) {
+    QMessageBox::critical(0, "Error!", "File doesn't exist!");
+    return;
+  }
+  MainWindow *newMainWindow = new MainWindow(fileName, nullptr);
+  newMainWindow->setAttribute(Qt::WA_DeleteOnClose);
+  newMainWindow->show();
+}
+
+MainWindow::MainWindow(QString fileName, QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow) {
+  QFile file(fileName);
+  if (!file.open(QIODevice::ReadOnly)) {
+    QMessageBox::critical(0, "Can't open file",
+                          "Can't open file to load machine!");
+    QTimer::singleShot(0, this, SLOT(close()));
+    return;
+  }
+  QByteArray saveData = file.readAll();
+  QJsonObject machineObject = QJsonDocument::fromJson(saveData).object();
+  if (machineObject["type"] == MachineType::TURING) {
+    automataScene = new TuringMachineScene(this);
+  } else {
+    automataScene = new DFAMachineScene(this);
+  }
+  automataScene->loadFromJson(machineObject);
+  init();
+}
 
 void MainWindow::on_file_saveAsImageAction() {}
 void MainWindow::clearRuntimeEnvironment() {

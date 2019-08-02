@@ -27,6 +27,8 @@ public:
   void clearTape();
   void removeTransition(Transition *);
   void removeState(State *);
+  std::vector<State *> allStates();
+  std::vector<Transition *> allTransitions();
   virtual void prepareRun();
   void setTape(Tape *);
   Tape *tape();

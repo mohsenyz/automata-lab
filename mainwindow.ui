@@ -409,11 +409,44 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSave</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_file_saveAction()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>578</x>
+     <y>350</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_file_openAction()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>578</x>
+     <y>350</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_file_newAction()</slot>
   <slot>on_file_saveAction()</slot>
   <slot>on_file_saveAsActio()</slot>
   <slot>on_file_saveAsImageAction()</slot>
+  <slot>on_file_openAction()</slot>
  </slots>
 </ui>
