@@ -42,11 +42,12 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer::singleShot(0, this, SLOT(close()));
     return;
   }
+  ui->setupUi(this);
   init();
+  createToolboxPanels();
 }
 
 void MainWindow::init() {
-  ui->setupUi(this);
   if (SCENE_MACHINE(automataScene)->type() == DFA) {
     setWindowTitle(tr("AutomataLab - DFA"));
   } else {
@@ -77,7 +78,7 @@ void MainWindow::init() {
   ui->tapeView->setRenderHints(QPainter::Antialiasing |
                                QPainter::SmoothPixmapTransform);
   ui->tapeView->centerOn(0, 0);
-  createToolboxPanels();
+  ui->graphicsView->updateScene({automataScene->sceneRect()});
 }
 
 void MainWindow::headMoved(QPointF pos) {}
@@ -181,7 +182,7 @@ void MainWindow::transitionEditRule(Transition *transition) {
         transitionInserted(transition);
       }
       automataScene->update();
-    } else if (!ok) {
+    } else if (!ok && !labelText.trimmed().isEmpty()) {
       SCENE_DFA_MACHINE(automataScene)
           ->removeTransition(DRAWABLE_DFA_TRANSITION(transition));
     } else if (ok) {
@@ -260,6 +261,7 @@ void MainWindow::on_setInputBtn_clicked() {
   tapeScene->addItem(tapeDrawable);
   ui->fastRunBtn->setEnabled(true);
   ui->nextStepBtn->setEnabled(true);
+  tapeDrawable->setLocked(false);
   ui->tapeView->setSceneRect(tapeScene->itemsBoundingRect());
 }
 
@@ -346,7 +348,11 @@ void MainWindow::on_file_saveAction() {
   automataScene->saveTo(saveFileName);
 }
 
-void MainWindow::on_file_saveAsAction() {}
+QJsonObject jsonObject;
+
+void MainWindow::on_file_saveAsAction() {
+  automataScene->loadFromJson(jsonObject);
+}
 
 void MainWindow::on_file_openAction() {
   QString fileName =
@@ -356,13 +362,6 @@ void MainWindow::on_file_openAction() {
     QMessageBox::critical(0, "Error!", "File doesn't exist!");
     return;
   }
-  MainWindow *newMainWindow = new MainWindow(fileName, nullptr);
-  newMainWindow->setAttribute(Qt::WA_DeleteOnClose);
-  newMainWindow->show();
-}
-
-MainWindow::MainWindow(QString fileName, QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
   QFile file(fileName);
   if (!file.open(QIODevice::ReadOnly)) {
     QMessageBox::critical(0, "Can't open file",
@@ -372,14 +371,22 @@ MainWindow::MainWindow(QString fileName, QWidget *parent)
   }
   QByteArray saveData = file.readAll();
   QJsonObject machineObject = QJsonDocument::fromJson(saveData).object();
+  AutomataScene *oldScene = automataScene;
   if (machineObject["type"] == MachineType::TURING) {
     automataScene = new TuringMachineScene(this);
   } else {
     automataScene = new DFAMachineScene(this);
   }
-  automataScene->loadFromJson(machineObject);
+  automataScene->setSceneRect(0, 0, 2000, 2000);
+  jsonObject = machineObject;
+  delete oldScene;
+  multipleRunLayout->setMachine(SCENE_MACHINE(automataScene));
+  QTimer::singleShot(500, this, SLOT(on_file_saveAsAction()));
   init();
 }
+
+MainWindow::MainWindow(QString fileName, QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow) {}
 
 void MainWindow::on_file_saveAsImageAction() {}
 void MainWindow::clearRuntimeEnvironment() {
@@ -389,4 +396,9 @@ void MainWindow::clearRuntimeEnvironment() {
   ui->fastRunBtn->setEnabled(false);
   ui->nextStepBtn->setEnabled(false);
   ui->setInputBtn->setEnabled(true);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event) {
+  QMainWindow::resizeEvent(event);
+  automataScene->update();
 }

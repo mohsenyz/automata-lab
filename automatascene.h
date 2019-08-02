@@ -33,7 +33,7 @@ protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
 
 private:
-  Mode _currentMode;
+  Mode _currentMode = Mode::Select;
   MachineType _machineType;
   unsigned int _stateIndex = 0;
 };

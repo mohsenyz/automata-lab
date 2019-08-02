@@ -143,8 +143,7 @@ void TuringMachineScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     AutomataScene::mousePressEvent(mouseEvent);
   }
   if (currentMode() == Mode::InsertState && selectedItems().isEmpty()) {
-    StateDrawable *state =
-        new StateDrawable(tr("P") + QString::number(stateIndex()));
+    StateDrawable *state = new StateDrawable(getNewStateName(this));
     addState(state, mouseEvent->scenePos());
   }
   if (!selectedItems().isEmpty() && currentMode() == Mode::InsertState) {

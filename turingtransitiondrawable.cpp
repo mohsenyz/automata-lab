@@ -91,7 +91,7 @@ void TuringTransitionDrawable::paint(QPainter *painter,
     painter->drawText(textRect, labelText,
                       QTextOption(Qt::AlignmentFlag::AlignCenter));
 
-    _linePath.addRect(rect);
+    _linePath.addRect(textRect);
     return;
   }
 

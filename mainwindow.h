@@ -14,9 +14,10 @@ class MainWindow : public QMainWindow {
 
 public:
   explicit MainWindow(QWidget *parent = nullptr);
-  ~MainWindow();
+  ~MainWindow() override;
   explicit MainWindow(QString fileName, QWidget *parent = nullptr);
   void init();
+  void resizeEvent(QResizeEvent *event) override;
 public slots:
   void on_newStateBtn_clicked();
   void on_moveBtn_clicked();

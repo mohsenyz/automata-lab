@@ -80,9 +80,6 @@ void AutomataScene::saveTo(QString fileName) {
       DFATransitionDrawable *dtd = DRAWABLE_DFA_TRANSITION(transition);
       transitionJson["to_state"] = dtd->toState()->label();
     }
-    QGraphicsItem *item = GRAPHICS_ITEM(transition);
-    transitionJson["x"] = item->x();
-    transitionJson["y"] = item->y();
     transitionsJson.push_back(transitionJson);
   }
 
@@ -100,14 +97,17 @@ void AutomataScene::loadFromJson(QJsonObject machineObject) {
   for (int i = 0; i < statesArray.size(); i++) {
     QJsonObject stateObject = statesArray[i].toObject();
     StateDrawable *sd = new StateDrawable(stateObject["label"].toString());
-    sd->setPos(stateObject["x"].toInt(), stateObject["y"].toInt());
     sd->setInitial(stateObject["is_initial"].toBool());
     sd->setFinal(stateObject["is_final"].toBool());
+    QPointF pos = QPointF(stateObject["x"].toInt(), stateObject["y"].toInt());
     if (type == TURING) {
-      SCENE_TURING_MACHINE(machine)->addState(sd, sd->pos());
+      SCENE_TURING_MACHINE(this)->addState(sd, pos);
     } else {
-      SCENE_DFA_MACHINE(machine)->addState(sd, sd->pos());
+      SCENE_DFA_MACHINE(this)->addState(
+          sd, QPointF(stateObject["x"].toInt(), stateObject["y"].toInt()));
     }
+    sd->setPos(pos);
+    update();
   }
 
   QJsonArray transitionsArray = machineObject["transitions"].toArray();
@@ -128,12 +128,13 @@ void AutomataScene::loadFromJson(QJsonObject machineObject) {
       TuringTransitionDrawable *ttd = new TuringTransitionDrawable(
           fromState, toState, accept, transitionObject["write"].toString()[0],
           direction);
-      SCENE_TURING_MACHINE(machine)->addTransition(ttd);
+      SCENE_TURING_MACHINE(this)->addTransition(ttd);
     } else {
       DFATransitionDrawable *dtd =
           new DFATransitionDrawable(fromState, toState, accept);
-      SCENE_DFA_MACHINE(machine)->addTransition(dtd);
+      SCENE_DFA_MACHINE(this)->addTransition(dtd);
     }
+    update();
   }
   update();
 }
