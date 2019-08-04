@@ -1,5 +1,6 @@
 ﻿#include "mainwindow.h"
 #include "dfamachinescene.h"
+#include "turingmachinescene.h"
 #include "ui_utils.h"
 #include <QCheckBox>
 #include <QFileDialog>
@@ -8,9 +9,13 @@
 #include <QJsonObject>
 #include <QLabel>
 #include <QMessageBox>
+#include <QNetworkReply>
 #include <QPalette>
+#include <QPdfWriter>
+#include <QPixmap>
 #include <QPropertyAnimation>
 #include <QScrollBar>
+#include <QSettings>
 #include <QSpacerItem>
 #include <QTimer>
 #include <QWidget>
@@ -20,7 +25,45 @@ using namespace AutomataLab;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
+  manager = new QNetworkAccessManager();
+  connect(manager, SIGNAL(finished(QNetworkReply *)), this,
+          SLOT(onActivationResultReceived(QNetworkReply *)));
+  askForMachineType();
+  ui->setupUi(this);
+  initWindowTitle();
+  initViews();
+  initObservers();
+  createToolboxPanels();
+}
 
+void MainWindow::onActivationResultReceived(QNetworkReply *reply) {
+  if (reply->error()) {
+    QMessageBox::critical(0, "Error!", "Failed to connect to internet");
+    return;
+  }
+  QString answer = reply->readAll();
+  if (answer.trimmed() == "403") {
+    QMessageBox::critical(0, "Error!", "Invalid serial number");
+  } else if (answer.trimmed() == "OK") {
+    QMessageBox::information(0, "Software activated!",
+                             "Software activated successfully!");
+    QSettings settings("Mohsenyz", "Machine lab");
+    settings.setValue("purchased", true);
+  }
+}
+
+void MainWindow::on_help_productActivationAction() {
+  bool ok;
+  QString text = QInputDialog::getText(
+      this, tr("Product activation"), tr("Enter serial to activate product"),
+      QLineEdit::Normal, "Ex : 0021502350236", &ok);
+  if (ok) {
+    manager->get(QNetworkRequest(
+        "http://git.playoffapp.ir:8898/apps/mohsenyz/validate?serial=" + text));
+  }
+}
+
+void MainWindow::askForMachineType() {
   QMessageBox msgBox;
   msgBox.setText("Select an automata to draw:");
   QPushButton *dfaButton = msgBox.addButton(tr("DFA"), QMessageBox::ActionRole);
@@ -32,41 +75,36 @@ MainWindow::MainWindow(QWidget *parent)
 
   if (msgBox.clickedButton() == dfaButton) {
     automataScene = new DFAMachineScene(this);
-    setWindowTitle(tr("AutomataLab - DFA"));
   } else if (msgBox.clickedButton() == turingButton) {
+    QSettings settings("Mohsenyz", "Machine lab");
+    if (!settings.value("purchased").toBool()) {
+      QMessageBox::critical(
+          0, "App is not activated",
+          "Please activate the product from help menu, and try again");
+      askForMachineType();
+      return;
+    }
     automataScene = new TuringMachineScene(this);
-    setWindowTitle(tr("AutomataLab - Turing"));
   }
 
+  // User canceled the operation, close the window
   if (ret == QMessageBox::Cancel) {
     QTimer::singleShot(0, this, SLOT(close()));
     return;
   }
-  ui->setupUi(this);
-  init();
-  createToolboxPanels();
 }
 
-void MainWindow::init() {
-  if (SCENE_MACHINE(automataScene)->type() == DFA) {
+void MainWindow::initWindowTitle() {
+  if (automataScene->machineType() == DFA) {
     setWindowTitle(tr("AutomataLab - DFA"));
   } else {
-    setWindowTitle(tr("AutomataLab - Turing"));
+    setWindowTitle("AutomataLab - Turing");
   }
+}
 
+void MainWindow::initViews() {
   ui->statusBar->showMessage("Welcome to auomata lab, You can read more about "
                              "automata lab in help tab");
-  connect(automataScene, SIGNAL(requestSelect()), this, SLOT(requestSelect()));
-  connect(automataScene, SIGNAL(stateUnselected()), this,
-          SLOT(stateUnselected()));
-  connect(automataScene, SIGNAL(transitionInserted(Transition *)), this,
-          SLOT(transitionInserted(Transition *)));
-  connect(automataScene, SIGNAL(transitionEditRule(Transition *)), this,
-          SLOT(transitionEditRule(Transition *)));
-  connect(automataScene, SIGNAL(stateEditLabel(State *)), this,
-          SLOT(stateEditLabel(State *)));
-  connect(automataScene, SIGNAL(stateSelected(State *)), this,
-          SLOT(stateSelected(State *)));
   automataScene->setSceneRect(0, 0, 2000, 2000);
   ui->graphicsView->setScene(automataScene);
   ui->graphicsView->setRenderHints(QPainter::Antialiasing |
@@ -81,11 +119,25 @@ void MainWindow::init() {
   ui->graphicsView->updateScene({automataScene->sceneRect()});
 }
 
+void MainWindow::initObservers() {
+  connect(automataScene, SIGNAL(requestSelect()), this, SLOT(requestSelect()));
+  connect(automataScene, SIGNAL(stateUnselected()), this,
+          SLOT(stateUnselected()));
+  connect(automataScene, SIGNAL(transitionInserted(Transition *)), this,
+          SLOT(transitionInserted(Transition *)));
+  connect(automataScene, SIGNAL(transitionEditRule(Transition *)), this,
+          SLOT(transitionEditRule(Transition *)));
+  connect(automataScene, SIGNAL(stateEditLabel(State *)), this,
+          SLOT(stateEditLabel(State *)));
+  connect(automataScene, SIGNAL(stateSelected(State *)), this,
+          SLOT(stateSelected(State *)));
+}
+
 void MainWindow::headMoved(QPointF pos) {}
 
 void MainWindow::stateSetInitial(StateDrawable *state) {
-  if (SCENE_MACHINE(automataScene)->initialStateExists() &&
-      SCENE_MACHINE(automataScene)->initialState() != state) {
+  if (MACHINE(automataScene)->initialStateExists() &&
+      MACHINE(automataScene)->initialState() != state) {
     QMessageBox::critical(0, tr("Error!"),
                           tr("An automata can't have multiple initial state"));
     return;
@@ -101,7 +153,7 @@ void MainWindow::createToolboxPanels() {
   ui->toolBox->removeItem(0);
   inspectorLayout->attach(ui->toolBox);
 
-  multipleRunLayout = new MultipleRunLayout(this, SCENE_MACHINE(automataScene));
+  multipleRunLayout = new MultipleRunLayout(this, MACHINE(automataScene));
   ui->toolBox->removeItem(1);
   multipleRunLayout->attach(ui->toolBox);
   multipleRunLayout->focus();
@@ -112,7 +164,14 @@ void MainWindow::uncheckToolBtns() {
   ui->newTransitionBtn->setChecked(false);
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow() {
+  delete ui;
+  delete inspectorLayout;
+  delete multipleRunLayout;
+  delete automataScene;
+  delete tapeDrawable;
+  delete tapeScene;
+}
 
 void MainWindow::stateSelected(State *state) {
   inspectorLayout->focus();
@@ -155,8 +214,7 @@ void MainWindow::transitionEditRule(Transition *transition) {
       }
       automataScene->update();
     } else if (!ok && tt->write() == ' ') {
-      SCENE_TURING_MACHINE(automataScene)
-          ->removeTransition(DRAWABLE_TURING_TRANSITION(transition));
+      automataScene->removeTransition(DRAWABLE_TURING_TRANSITION(transition));
     } else if (ok) {
       QMessageBox::critical(0, "Invalid rule",
                             "Rules must be in this format : "
@@ -183,8 +241,7 @@ void MainWindow::transitionEditRule(Transition *transition) {
       }
       automataScene->update();
     } else if (!ok && !labelText.trimmed().isEmpty()) {
-      SCENE_DFA_MACHINE(automataScene)
-          ->removeTransition(DRAWABLE_DFA_TRANSITION(transition));
+      automataScene->removeTransition(DRAWABLE_DFA_TRANSITION(transition));
     } else if (ok) {
       QMessageBox::critical(0, "Invalid rule",
                             "Rules must be in this format : "
@@ -255,7 +312,7 @@ void MainWindow::on_setInputBtn_clicked() {
     QMessageBox::critical(0, "Error!", "Input cannot contain blank character");
     return;
   }
-  tapeDrawable = new TapeDrawable(input, SCENE_MACHINE(automataScene)->type());
+  tapeDrawable = new TapeDrawable(input, MACHINE(automataScene)->type());
   connect(tapeDrawable, SIGNAL(headMoved(QPointF)), this,
           SLOT(headMoved(QPointF)));
   tapeScene->addItem(tapeDrawable);
@@ -266,7 +323,7 @@ void MainWindow::on_setInputBtn_clicked() {
 }
 
 void AutomataLab::MainWindow::on_fastRunBtn_clicked() {
-  Machine *machine = SCENE_MACHINE(automataScene);
+  Machine *machine = MACHINE(automataScene);
   if (!machine->initialStateExists()) {
     QMessageBox::critical(0, "Error!", "No initial state found!");
     return;
@@ -289,7 +346,7 @@ void AutomataLab::MainWindow::on_fastRunBtn_clicked() {
 }
 
 void MainWindow::on_nextStepBtn_clicked() {
-  Machine *machine = SCENE_MACHINE(automataScene);
+  Machine *machine = MACHINE(automataScene);
   if (!machine->initialStateExists()) {
     QMessageBox::critical(0, "Error!", "No initial state found!");
     return;
@@ -348,10 +405,20 @@ void MainWindow::on_file_saveAction() {
   automataScene->saveTo(saveFileName);
 }
 
-QJsonObject jsonObject;
-
 void MainWindow::on_file_saveAsAction() {
+  saveFileName = QFileDialog::getSaveFileName(this, tr("Save machine"),
+                                              "/home/ubuntu/automata.aml",
+                                              tr("AutomataLab file (*.aml))"));
+  if (saveFileName.isEmpty()) {
+    return;
+  }
+  QFile file(saveFileName);
+  automataScene->saveTo(saveFileName);
+}
+
+void MainWindow::loadSavedAutomata() {
   automataScene->loadFromJson(jsonObject);
+  initWindowTitle();
 }
 
 void MainWindow::on_file_openAction() {
@@ -373,24 +440,45 @@ void MainWindow::on_file_openAction() {
   QJsonObject machineObject = QJsonDocument::fromJson(saveData).object();
   AutomataScene *oldScene = automataScene;
   if (machineObject["type"] == MachineType::TURING) {
+    QSettings settings("Mohsenyz", "Machine lab");
+    if (!settings.value("purchased").toBool()) {
+      QMessageBox::critical(
+          0, "App is not activated",
+          "Please activate program from help menu to use Turing machine");
+      return;
+    }
     automataScene = new TuringMachineScene(this);
   } else {
     automataScene = new DFAMachineScene(this);
   }
   automataScene->setSceneRect(0, 0, 2000, 2000);
   jsonObject = machineObject;
+  saveFileName = fileName;
   delete oldScene;
-  multipleRunLayout->setMachine(SCENE_MACHINE(automataScene));
-  QTimer::singleShot(500, this, SLOT(on_file_saveAsAction()));
-  init();
+  multipleRunLayout->setMachine(MACHINE(automataScene));
+  QTimer::singleShot(500, this, SLOT(loadSavedAutomata()));
+  ui->graphicsView->setScene(automataScene);
+  initObservers();
 }
 
-MainWindow::MainWindow(QString fileName, QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {}
+void MainWindow::on_file_saveAsImageAction() {
+  saveFileName = QFileDialog::getSaveFileName(this, tr("Save machine as image"),
+                                              "/home/ubuntu/automata.png",
+                                              tr("Image file (*.png))"));
+  if (saveFileName.isEmpty()) {
+    return;
+  }
+  automataScene->clearSelection();
+  QImage image(automataScene->sceneRect().size().toSize(),
+               QImage::Format_ARGB32);
+  image.fill(Qt::transparent);
+  QPainter painter(&image);
+  painter.setRenderHint(QPainter::Antialiasing);
+  automataScene->render(&painter);
+  image.save(saveFileName);
+}
 
-void MainWindow::on_file_saveAsImageAction() {}
 void MainWindow::clearRuntimeEnvironment() {
-
   isRunning = false;
   ui->stopBtn->setEnabled(false);
   ui->fastRunBtn->setEnabled(false);
@@ -398,7 +486,50 @@ void MainWindow::clearRuntimeEnvironment() {
   ui->setInputBtn->setEnabled(true);
 }
 
+void MainWindow::on_file_saveAsPdf() {
+  saveFileName = QFileDialog::getSaveFileName(this, tr("Save machine as pdf"),
+                                              "/home/ubuntu/automata.pdf",
+                                              tr("Pdf file (*.pdf))"));
+  if (saveFileName.isEmpty()) {
+    return;
+  }
+  automataScene->clearSelection();
+  QImage image(automataScene->sceneRect().size().toSize(),
+               QImage::Format_ARGB32);
+  image.fill(Qt::transparent);
+  QPainter painter(&image);
+  painter.setRenderHint(QPainter::Antialiasing);
+  automataScene->render(&painter);
+  QPdfWriter pdfWriter(saveFileName);
+  pdfWriter.setPageSize(QPagedPaintDevice::A4);
+  pdfWriter.setResolution(1500);
+  QPainter p(&pdfWriter);
+  p.drawImage(QPoint(0, 0), image.scaled(pdfWriter.width(), pdfWriter.height(),
+                                         Qt::AspectRatioMode::KeepAspectRatio));
+  p.drawText(QPointF(0, pdfWriter.height() - 100), "Created by automata lab");
+}
+
 void MainWindow::resizeEvent(QResizeEvent *event) {
   QMainWindow::resizeEvent(event);
   automataScene->update();
+}
+
+void MainWindow::on_newComponentBtn_clicked() {
+  QString fileName =
+      QFileDialog::getOpenFileName(this, tr("Open machine"), "/home/ubuntu",
+                                   tr("AutomataLab file (*.aml) "));
+  if (fileName.isEmpty()) {
+    QMessageBox::critical(0, "Error!", "File doesn't exist!");
+    return;
+  }
+  QFile file(fileName);
+  if (!file.open(QIODevice::ReadOnly)) {
+    QMessageBox::critical(0, "Can't open file",
+                          "Can't open file to load machine!");
+    QTimer::singleShot(0, this, SLOT(close()));
+    return;
+  }
+  QByteArray saveData = file.readAll();
+  QJsonObject machineObject = QJsonDocument::fromJson(saveData).object();
+  automataScene->loadFromJson(machineObject, "A:");
 }

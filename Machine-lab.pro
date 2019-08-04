@@ -6,6 +6,8 @@
 
 QT       += core gui
 QT       += testlib
+QT       += printsupport
+QT       += network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Machine-lab
@@ -36,6 +38,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         multiplerunlayout.cpp \
+        serializable.cpp \
         state.cpp \
         statedrawable.cpp \
         tape.cpp \
@@ -43,6 +46,7 @@ SOURCES += \
         testsuite.cpp \
         tape_test.cpp \
         transition.cpp \
+        transitiondrawable.cpp \
         turingmachine.cpp \
         turingmachine_test.cpp \
         turingmachinescene.cpp \
@@ -61,6 +65,7 @@ HEADERS += \
         machine.h \
         mainwindow.h \
         multiplerunlayout.h \
+        serializable.h \
         state.h \
         statedrawable.h \
         tape.h \
@@ -68,6 +73,7 @@ HEADERS += \
         testsuite.h \
         tape_test.h \
         transition.h \
+        transitiondrawable.h \
         turingmachine.h \
         turingmachine_test.h \
         turingmachinescene.h \

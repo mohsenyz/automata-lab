@@ -35,6 +35,8 @@ public:
   void virtual nextStep() = 0;
   Transition *nextTransition();
   State *currentState();
+  std::vector<Transition *> findAllTransitions(State *);
+  std::vector<Transition *> findAllTransitionsBetween(State *, State *);
   virtual MachineType type() = 0;
   virtual bool isHalted() = 0;
   virtual bool isAccepted() = 0;

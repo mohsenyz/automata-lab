@@ -4,16 +4,13 @@
 
 namespace AutomataLab {
 
+/**
+ * @brief The DFATransition class, Holds automata dfa transition information
+ */
 class DFATransition : public Transition {
 public:
   ~DFATransition();
-  DFATransition(State *, State *, std::vector<QChar>);
-  DFATransition(State *, State *, QChar);
-  State *toState();
-  bool operator==(DFATransition &);
-
-private:
-  State *_toState;
+  using Transition::Transition;
 };
 
 } // namespace AutomataLab

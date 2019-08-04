@@ -4,6 +4,7 @@
 #include "dfamachinescene.h"
 #include "dfatransitiondrawable.h"
 #include "machine.h"
+#include "serializable.h"
 #include "statedrawable.h"
 #include "turingmachinescene.h"
 #include "turingtransitiondrawable.h"
@@ -22,9 +23,15 @@ QGraphicsDropShadowEffect *state_default_shadow_effect();
 
 #define SCENE_DFA_MACHINE(scene) (dynamic_cast<DFAMachineScene *>(scene))
 
-#define SCENE_MACHINE(scene) (dynamic_cast<Machine *>(scene))
+#define MACHINE(scene) (dynamic_cast<Machine *>(scene))
 
 #define GRAPHICS_ITEM(item) (dynamic_cast<QGraphicsItem *>(item))
+
+#define SERIALIZABLE_ITEM(item) (dynamic_cast<Serializable *>(item))
+
+#define TRANSITION(item) (dynamic_cast<Transition *>(item))
+
+#define DRAWABLE_TRANSITION(item) (dynamic_cast<TransitionDrawable *>(item))
 
 QString getNewStateName(Machine *machine);
 

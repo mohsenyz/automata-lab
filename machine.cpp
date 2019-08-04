@@ -110,3 +110,29 @@ void Machine::setTape(Tape *input) { _tape = input; }
 std::vector<State *> Machine::allStates() { return states; }
 
 std::vector<Transition *> Machine::allTransitions() { return transitions; }
+
+std::vector<Transition *> Machine::findAllTransitionsBetween(State *fState,
+                                                             State *sState) {
+  std::vector<Transition *> result;
+  for (auto transition : transitions) {
+    Transition *turingTransition = dynamic_cast<Transition *>(transition);
+    bool fromFirstToSecond = *(turingTransition->fromState()) == *fState &&
+                             *(turingTransition->toState()) == *sState;
+    bool fromSecondToFirst = *(turingTransition->fromState()) == *sState &&
+                             *(turingTransition->toState()) == *fState;
+    if (fromFirstToSecond || fromSecondToFirst)
+      result.push_back(turingTransition);
+  }
+  return result;
+}
+
+std::vector<Transition *> Machine::findAllTransitions(State *state) {
+  std::vector<Transition *> result;
+  for (auto transition : transitions) {
+    Transition *turingTransition = dynamic_cast<Transition *>(transition);
+    if (*(turingTransition->fromState()) == *state ||
+        *(turingTransition->toState()) == *state)
+      result.push_back(turingTransition);
+  }
+  return result;
+}

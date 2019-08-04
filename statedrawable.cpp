@@ -4,7 +4,11 @@
 
 using namespace AutomataLab;
 
-StateDrawable::StateDrawable(QString label) : State(label) {
+StateDrawable::StateDrawable() { init(); }
+
+StateDrawable::StateDrawable(QString label) : State(label) { init(); }
+
+void StateDrawable::init() {
   setFlag(QGraphicsItem::ItemIsMovable, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
@@ -80,6 +84,18 @@ int StateDrawable::type() const { return AutomataScene::ItemType::StateItem; }
 void StateDrawable::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   update();
   QGraphicsItem::mousePressEvent(event);
+}
+
+void StateDrawable::readJson(QJsonObject &jsonObject) {
+  State::readJson(jsonObject);
+  int x = jsonObject["x"].toInt(), y = jsonObject["y"].toInt();
+  setPos(x, y);
+}
+
+void StateDrawable::writeJson(QJsonObject &jsonObject) {
+  State::writeJson(jsonObject);
+  jsonObject["x"] = x();
+  jsonObject["y"] = y();
 }
 
 void StateDrawable::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {

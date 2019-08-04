@@ -7,6 +7,7 @@
 #include "turingmachinescene.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
+#include <QNetworkAccessManager>
 
 namespace AutomataLab {
 class MainWindow : public QMainWindow {
@@ -15,8 +16,6 @@ class MainWindow : public QMainWindow {
 public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow() override;
-  explicit MainWindow(QString fileName, QWidget *parent = nullptr);
-  void init();
   void resizeEvent(QResizeEvent *event) override;
 public slots:
   void on_newStateBtn_clicked();
@@ -38,13 +37,26 @@ public slots:
   void on_file_openAction();
   void on_file_saveAction();
   void on_file_saveAsAction();
+  void on_file_saveAsPdf();
+  void loadSavedAutomata();
   void on_file_saveAsImageAction();
+  void on_help_productActivationAction();
+  void onActivationResultReceived(QNetworkReply *);
+
+private slots:
+  void on_newComponentBtn_clicked();
 
 private:
   QString saveFileName = "";
   bool isRunning;
+  QNetworkAccessManager *manager;
   void createToolboxPanels();
   void clearRuntimeEnvironment();
+  void askForMachineType();
+  void initWindowTitle();
+  void initViews();
+  void initObservers();
+  QJsonObject jsonObject;
   InspectorLayout *inspectorLayout;
   MultipleRunLayout *multipleRunLayout;
   Ui::MainWindow *ui;

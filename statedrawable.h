@@ -16,27 +16,30 @@ class StateDrawable : public QObject, public State, public QGraphicsItem {
       QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
   Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor)
 public:
+  StateDrawable();
   StateDrawable(QString label);
   virtual ~StateDrawable();
-  QRectF boundingRect() const;
+  QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-             QWidget *widget);
-  int type() const;
+             QWidget *widget) override;
+  int type() const override;
   QColor backgroundColor() const;
   void setBackgroundColor(QColor color);
 
   QColor borderColor() const;
   void setBorderColor(QColor color);
+  virtual void readJson(QJsonObject &) override;
+  virtual void writeJson(QJsonObject &) override;
 
 private:
+  void init();
   QColor _backgroundColor;
   QColor _borderColor;
   QGraphicsDropShadowEffect *shadowEffect;
 
 protected:
-  // overriding mouse events
-  void mousePressEvent(QGraphicsSceneMouseEvent *event);
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+  void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 };
 }; // namespace AutomataLab
 

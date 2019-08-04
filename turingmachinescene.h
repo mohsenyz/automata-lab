@@ -12,20 +12,6 @@ class TuringMachineScene : public AutomataScene, public TuringMachine {
   Q_OBJECT
 public:
   TuringMachineScene(QObject *parent);
-  void addState(StateDrawable *, QPointF);
-  void addTransition(TuringTransitionDrawable *transition);
-  void removeTransition(TuringTransitionDrawable *transition);
-  void removeState(StateDrawable *state);
-
-protected:
-  void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
-  void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
-  void keyPressEvent(QKeyEvent *keyEvent) override;
-
-private:
-  void recurveTransitions(State *fromState, State *toState);
-  QGraphicsLineItem *tempLine = nullptr;
 };
 
 } // namespace AutomataLab

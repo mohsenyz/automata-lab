@@ -10,8 +10,6 @@ public:
   using Machine::Machine;
   ~DFAMachine();
   MachineType type();
-  std::vector<DFATransition *> findAllTransitions(State *);
-  std::vector<DFATransition *> findAllTransitionsBetween(State *, State *);
   void nextStep();
   bool isHalted();
   bool isAccepted();
