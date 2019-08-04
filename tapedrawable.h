@@ -6,19 +6,40 @@
 #include <QGraphicsItem>
 
 namespace AutomataLab {
+
+/**
+ * @brief The TapeDrawable class
+ */
 class TapeDrawable : public QObject, public Tape, public QGraphicsItem {
   Q_OBJECT
 public:
+  /**
+   * @brief TapeDrawable
+   * @param type
+   */
   explicit TapeDrawable(QString, MachineType type);
   int type() const override;
   QRectF boundingRect() const override;
   void moveRight() override;
   void moveLeft() override;
   void write(QChar) override;
+
+  /**
+   * @brief Returns true if tape is locked
+   * @return
+   */
   bool isLocked();
+
+  /**
+   * @brief Locks tape from changing head, Used during machine runtime
+   * @return
+   */
   void setLocked(bool locked);
 
 signals:
+  /**
+   * @brief emits when head moves
+   */
   void headMoved(QPointF);
 
 protected:

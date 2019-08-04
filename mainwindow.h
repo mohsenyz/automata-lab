@@ -47,6 +47,7 @@ private slots:
   void on_newComponentBtn_clicked();
 
 private:
+  int numOfComponents = 1;
   QString saveFileName = "";
   bool isRunning;
   QNetworkAccessManager *manager;

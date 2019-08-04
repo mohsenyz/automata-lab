@@ -74,8 +74,8 @@ void AutomataScene::saveTo(QString fileName) {
   file.close();
 }
 
-void AutomataScene::loadFromJson(QJsonObject machineObject,
-                                 QString statePrefix) {
+void AutomataScene::loadFromJson(QJsonObject machineObject, QString statePrefix,
+                                 bool disableStartState) {
   Machine *machine = MACHINE(this);
   int type = machineObject["type"].toInt();
   QJsonArray statesArray = machineObject["states"].toArray();
@@ -86,6 +86,9 @@ void AutomataScene::loadFromJson(QJsonObject machineObject,
     stateObject["label"] = statePrefix + stateObject["label"].toString();
     StateDrawable *sd = new StateDrawable();
     sd->readJson(stateObject);
+    if (disableStartState) {
+      sd->setInitial(false);
+    }
     addState(sd, QPointF());
     update();
   }

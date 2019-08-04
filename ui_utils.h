@@ -12,6 +12,10 @@
 
 using namespace AutomataLab;
 
+/**
+ * @brief Gets shadow effect for state
+ * @return
+ */
 QGraphicsDropShadowEffect *state_default_shadow_effect();
 
 #define DRAWABLE_STATE(state) (dynamic_cast<StateDrawable *>(state))
@@ -33,6 +37,11 @@ QGraphicsDropShadowEffect *state_default_shadow_effect();
 
 #define DRAWABLE_TRANSITION(item) (dynamic_cast<TransitionDrawable *>(item))
 
+/**
+ * @brief Suggests a label for new created state, name is always available
+ * @param machine
+ * @return
+ */
 QString getNewStateName(Machine *machine);
 
 #define DRAWABLE_DFA_TRANSITION(state)                                         \

@@ -8,6 +8,9 @@
 
 namespace AutomataLab {
 
+/**
+ * @brief The DFAMachineScene class
+ */
 class DFAMachineScene : public AutomataScene, public DFAMachine {
   Q_OBJECT
 public:

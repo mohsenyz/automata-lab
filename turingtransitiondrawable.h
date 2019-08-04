@@ -12,16 +12,30 @@
 
 namespace AutomataLab {
 
+/**
+ * @brief The TuringTransitionDrawable class
+ */
 class TuringTransitionDrawable : public TuringTransition,
                                  public TransitionDrawable {
 public:
   using TuringTransition::TuringTransition;
+
+  /**
+   * @brief TuringTransitionDrawable with multiple accepting input
+   */
   TuringTransitionDrawable(StateDrawable *, StateDrawable *, std::vector<QChar>,
                            QChar, Direction);
 
+  /**
+   * @brief TuringTransitionDrawable with single accepting character
+   */
   TuringTransitionDrawable(StateDrawable *, StateDrawable *, QChar, QChar,
                            Direction);
 
+  /**
+   * @brief Retuens box label, shown in transition black box
+   * @return
+   */
   QString getBoxLabel() override;
 };
 

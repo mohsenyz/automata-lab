@@ -11,13 +11,27 @@
 #include <QStyleOptionGraphicsItem>
 
 namespace AutomataLab {
-
+/**
+ * @brief The DFATransitionDrawable class
+ */
 class DFATransitionDrawable : public DFATransition, public TransitionDrawable {
 public:
   using DFATransition::DFATransition;
+
+  /**
+   * @brief DFATransitionDrawable with multiple accepted characters
+   */
   DFATransitionDrawable(StateDrawable *, StateDrawable *, std::vector<QChar>);
 
+  /**
+   * @brief DFATransitionDrawable with single accepted character
+   */
   DFATransitionDrawable(StateDrawable *, StateDrawable *, QChar);
+
+  /**
+   * @brief getBoxLabel, returns label to be drawn in transition black box!
+   * @return
+   */
   QString getBoxLabel() override;
 };
 

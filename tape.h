@@ -9,15 +9,53 @@
 
 namespace AutomataLab {
 
+/**
+ * @brief The Tape class
+ */
 class Tape {
 public:
+  /**
+   * Construct tape from input string
+   */
   explicit Tape(QString);
+
+  /**
+   * @brief Reads current character from tape
+   * @return
+   */
   QChar read();
+
+  /**
+   * @brief Moves tape head to right
+   */
   virtual void moveRight();
+
+  /**
+   * @brief Moves tape head to left
+   */
   virtual void moveLeft();
+
+  /**
+   * @brief Writes a character to current head
+   */
   virtual void write(QChar);
+
+  /**
+   * @brief Returns head index in deque
+   * @return
+   */
   unsigned int currentIndex();
+
+  /**
+   * @brief Returns user entered input size
+   * @return
+   */
   unsigned int inputSize() const;
+
+  /**
+   * @brief Converts tape to string
+   * @return
+   */
   QString toString();
 
 protected:

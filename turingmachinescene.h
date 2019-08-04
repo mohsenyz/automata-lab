@@ -8,6 +8,9 @@
 
 namespace AutomataLab {
 
+/**
+ * @brief The TuringMachineScene class
+ */
 class TuringMachineScene : public AutomataScene, public TuringMachine {
   Q_OBJECT
 public:

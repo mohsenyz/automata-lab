@@ -53,6 +53,13 @@ void MainWindow::onActivationResultReceived(QNetworkReply *reply) {
 }
 
 void MainWindow::on_help_productActivationAction() {
+  QSettings settings("Mohsenyz", "Machine lab");
+  if (settings.value("purchased").toBool()) {
+    QMessageBox::information(
+        0, "Program already activated!",
+        "Program is already activated, keep your money for yourself");
+    return;
+  }
   bool ok;
   QString text = QInputDialog::getText(
       this, tr("Product activation"), tr("Enter serial to activate product"),
@@ -531,5 +538,13 @@ void MainWindow::on_newComponentBtn_clicked() {
   }
   QByteArray saveData = file.readAll();
   QJsonObject machineObject = QJsonDocument::fromJson(saveData).object();
-  automataScene->loadFromJson(machineObject, "A:");
+  QString string = QString::number(machineObject["type"].toInt());
+  QString string1 = QString::number(machineObject["type"].toInt());
+  if (machineObject["type"].toInt() != automataScene->machineType()) {
+    QMessageBox::critical(
+        0, "Error!", "Current automata is not same as the component automata");
+    return;
+  }
+  automataScene->loadFromJson(machineObject,
+                              QString::number(numOfComponents++) + ":", true);
 }
